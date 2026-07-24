@@ -1,0 +1,153 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'Debug'|trans({}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ 'Diagnostics and testing tools'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+        </div>
+    </div>
+
+    <div class="tp-grid tp-grid--sidebar">
+        <div>
+            {# System status #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'System status'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-flex-between tp-mb-sm" style="padding: 8px 0; border-bottom: 1px solid var(--tp-border-light);">
+                        <span class="tp-text-sm">{{ 'Module enabled'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if isEnabled %}
+                            <span class="tp-badge tp-badge--success">{{ 'Yes'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--danger">{{ 'No'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm" style="padding: 8px 0; border-bottom: 1px solid var(--tp-border-light);">
+                        <span class="tp-text-sm">{{ 'GTM Container ID'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-font-mono tp-text-sm">{{ gtmId ?: '('~'not set'|trans({}, 'Modules.Tagpilot.Admin')~')' }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm" style="padding: 8px 0; border-bottom: 1px solid var(--tp-border-light);">
+                        <span class="tp-text-sm">{{ 'GA4 Measurement ID'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-font-mono tp-text-sm">{{ config.GA4_MEASUREMENT_ID ?: '('~'not set'|trans({}, 'Modules.Tagpilot.Admin')~')' }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm" style="padding: 8px 0; border-bottom: 1px solid var(--tp-border-light);">
+                        <span class="tp-text-sm">{{ 'Server-side purchase'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if config.SERVER_SIDE_PURCHASE %}
+                            <span class="tp-badge tp-badge--success">{{ 'Enabled'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Disabled'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm" style="padding: 8px 0; border-bottom: 1px solid var(--tp-border-light);">
+                        <span class="tp-text-sm">{{ 'Consent Mode v2'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if config.CONSENT_MODE %}
+                            <span class="tp-badge tp-badge--success">{{ 'Enabled'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Disabled'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between" style="padding: 8px 0;">
+                        <span class="tp-text-sm">{{ 'Debug mode'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if debugMode %}
+                            <span class="tp-badge tp-badge--warning">{{ 'Active'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Off'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Recent events #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Recent events (last 20)'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    {% if recentEvents|length > 0 %}
+                        <div class="tp-table-wrap">
+                            <table class="tp-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'ID'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                        <th>{{ 'Event'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                        <th>{{ 'URI'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                        <th>{{ 'Date'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in recentEvents %}
+                                    <tr>
+                                        <td class="tp-font-mono">{{ log.id_event_log }}</td>
+                                        <td><span class="tp-badge tp-badge--info">{{ log.event }}</span></td>
+                                        <td class="tp-text-sm tp-text-muted" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ log.uri }}</td>
+                                        <td class="tp-text-sm tp-text-muted" style="white-space: nowrap;">{{ log.date_add }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="tp-text-sm tp-text-muted tp-text-center" style="padding: 16px;">{{ 'No events recorded yet.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div>
+            {# Registered hooks #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Registered hooks'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    {% if hooks|length > 0 %}
+                        {% for hook in hooks %}
+                            <div class="tp-flex-between" style="padding: 6px 0; border-bottom: 1px solid var(--tp-border-light);">
+                                <span class="tp-font-mono tp-text-sm">{{ hook.name }}</span>
+                                <span class="tp-text-xs tp-text-muted">{{ 'pos: %pos%'|trans({'%pos%': hook.position}, 'Modules.Tagpilot.Admin') }}</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="tp-text-sm tp-text-muted">{{ 'No hooks registered.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Test connection #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Test Measurement Protocol'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <p class="tp-text-sm tp-text-muted tp-mb-md">
+                        {{ 'Send a test event to GA4 debug endpoint to verify your API secret.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </p>
+                    <button class="tp-btn tp-btn--primary tp-btn--sm" id="tp-test-mp">{{ 'Send test event'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    <div id="tp-test-result" class="tp-mt-md"></div>
+                </div>
+            </div>
+
+            {# GA4 Event flow #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'GA4 Ecommerce flow'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body" style="font-size: 13px; line-height: 2.2; color: var(--tp-text-secondary);">
+                    1. <span class="tp-badge tp-event-type--page">page_view</span><br>
+                    2. <span class="tp-badge tp-event-type--ecommerce">view_item_list</span><br>
+                    3. <span class="tp-badge tp-event-type--ecommerce">select_item</span><br>
+                    4. <span class="tp-badge tp-event-type--ecommerce">view_item</span><br>
+                    5. <span class="tp-badge tp-event-type--ecommerce">add_to_cart</span><br>
+                    6. <span class="tp-badge tp-event-type--ecommerce">view_cart</span><br>
+                    7. <span class="tp-badge tp-event-type--ecommerce">begin_checkout</span><br>
+                    8. <span class="tp-badge tp-event-type--ecommerce">add_shipping_info</span><br>
+                    9. <span class="tp-badge tp-event-type--ecommerce">add_payment_info</span><br>
+                    10. <span class="tp-badge tp-event-type--conversion">purchase</span> (+ API)<br>
+                    11. <span class="tp-badge tp-event-type--conversion">refund</span> ({{ 'API only'|trans({}, 'Modules.Tagpilot.Admin') }})
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

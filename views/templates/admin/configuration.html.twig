@@ -1,0 +1,415 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'Configuration'|trans({}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ 'Set up Google Tag Manager and GA4 Measurement Protocol'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+        </div>
+        <div class="tp-page-actions">
+            <button class="tp-btn tp-btn--primary" id="tp-save-config">{{ 'Save configuration'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+        </div>
+    </div>
+
+    <div class="tp-grid tp-grid--sidebar">
+        <div>
+            {# General #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'General'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-switch-card">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Enable tracking'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Activate GTM & GA4 tracking on the storefront'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="ENABLED" value="1" {{ config.ENABLED == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-form-group tp-mt-md">
+                        <label class="tp-label">{{ 'GTM Container ID'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                        <input type="text" class="tp-input" name="GTM_ID" value="{{ config.GTM_ID }}" placeholder="GTM-XXXXXXX" style="max-width: 300px;">
+                        <p class="tp-help-text">{{ 'Your Google Tag Manager container ID (e.g. GTM-ABC123)'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    </div>
+
+                    <div class="tp-switch-card tp-mt-sm">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Load GTM script'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Inject the GTM JavaScript snippet. Disable if loaded by another module.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="LOAD_GTM_SCRIPT" value="1" {{ config.LOAD_GTM_SCRIPT == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-card-footer tp-mt-md">
+                        <button class="tp-btn tp-btn--primary tp-btn--sm tp-save-section" type="button">{{ 'Save configuration'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    </div>
+                </div>
+            </div>
+
+            {# GA4 Measurement Protocol #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'GA4 Measurement Protocol (Server-side)'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-alert tp-alert--info tp-mb-md">
+                        {{ 'Server-side tracking sends purchase and refund events directly to GA4 via API, bypassing ad-blockers and ensuring reliable conversion tracking.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </div>
+
+                    <div class="tp-form-group">
+                        <label class="tp-label">{{ 'GA4 Measurement ID'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                        <input type="text" class="tp-input" name="GA4_MEASUREMENT_ID" value="{{ config.GA4_MEASUREMENT_ID }}" placeholder="G-XXXXXXXXXX" style="max-width: 300px;">
+                        <p class="tp-help-text">{{ 'Found in GA4 Admin > Data Streams > Web stream details'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    </div>
+
+                    <div class="tp-form-group">
+                        <label class="tp-label">{{ 'API Secret'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                        <input type="password" class="tp-input" name="GA4_API_SECRET" value="{{ config.GA4_API_SECRET }}" placeholder="{{ 'Enter your API secret'|trans({}, 'Modules.Tagpilot.Admin') }}" style="max-width: 400px;">
+                        <p class="tp-help-text">{{ 'GA4 Admin > Data Streams > Measurement Protocol API secrets'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    </div>
+
+                    <div class="tp-flex tp-gap-sm tp-mt-md">
+                        <button class="tp-btn tp-btn--secondary tp-btn--sm" id="tp-test-connection">{{ 'Test connection'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                        <span id="tp-connection-result" class="tp-text-sm" style="line-height: 32px;"></span>
+                    </div>
+
+                    <div class="tp-switch-card tp-mt-md">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Server-side purchase events'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Send purchase events via Measurement Protocol API'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="SERVER_SIDE_PURCHASE" value="1" {{ config.SERVER_SIDE_PURCHASE == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-switch-card">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Server-side refund events'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Send refund events via Measurement Protocol API'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="SERVER_SIDE_REFUND" value="1" {{ config.SERVER_SIDE_REFUND == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-card-footer tp-mt-md">
+                        <button class="tp-btn tp-btn--primary tp-btn--sm tp-save-section" type="button">{{ 'Save configuration'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    </div>
+                </div>
+            </div>
+
+            {# Consent Mode v2 #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Consent Mode v2'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-switch-card tp-mb-md">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Enable Consent Mode'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Set default consent state. Your CMP should update consent via gtag().'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="CONSENT_MODE" value="1" {{ config.CONSENT_MODE == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-grid tp-grid--2">
+                        <div class="tp-form-group">
+                            <label class="tp-label">{{ 'Default analytics_storage'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                            <select class="tp-select" name="CONSENT_DEFAULT_ANALYTICS">
+                                <option value="denied" {{ config.CONSENT_DEFAULT_ANALYTICS == 'denied' ? 'selected' : '' }}>{{ 'denied'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                                <option value="granted" {{ config.CONSENT_DEFAULT_ANALYTICS == 'granted' ? 'selected' : '' }}>{{ 'granted'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                            </select>
+                        </div>
+                        <div class="tp-form-group">
+                            <label class="tp-label">{{ 'Default ad_storage'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                            <select class="tp-select" name="CONSENT_DEFAULT_ADS">
+                                <option value="denied" {{ config.CONSENT_DEFAULT_ADS == 'denied' ? 'selected' : '' }}>{{ 'denied'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                                <option value="granted" {{ config.CONSENT_DEFAULT_ADS == 'granted' ? 'selected' : '' }}>{{ 'granted'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="tp-card-footer tp-mt-md">
+                        <button class="tp-btn tp-btn--primary tp-btn--sm tp-save-section" type="button">{{ 'Save configuration'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    </div>
+                </div>
+            </div>
+
+            {# Data settings #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Data settings'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-grid tp-grid--2">
+                        <div class="tp-form-group">
+                            <label class="tp-label">{{ 'Product identifier'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                            <select class="tp-select" name="PRODUCT_ID_FIELD">
+                                <option value="id" {{ config.PRODUCT_ID_FIELD == 'id' ? 'selected' : '' }}>{{ 'Product ID'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                                <option value="reference" {{ config.PRODUCT_ID_FIELD == 'reference' ? 'selected' : '' }}>{{ 'Reference'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                                <option value="ean13" {{ config.PRODUCT_ID_FIELD == 'ean13' ? 'selected' : '' }}>{{ 'EAN-13'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                            </select>
+                        </div>
+                        <div class="tp-form-group">
+                            <label class="tp-label">{{ 'Customer data'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                            <select class="tp-select" name="CUSTOMER_DATA">
+                                <option value="never" {{ config.CUSTOMER_DATA == 'never' ? 'selected' : '' }}>{{ 'Never send'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                                <option value="purchase" {{ config.CUSTOMER_DATA == 'purchase' ? 'selected' : '' }}>{{ 'On purchase only'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                                <option value="always" {{ config.CUSTOMER_DATA == 'always' ? 'selected' : '' }}>{{ 'Always (when logged in)'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="tp-switch-card tp-mt-sm">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Prices with tax'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Use tax-inclusive prices in dataLayer events'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="PRICE_WITH_TAX" value="1" {{ config.PRICE_WITH_TAX == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-switch-card">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Category hierarchy'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Include item_category2..5 with parent categories'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="CATEGORY_HIERARCHY" value="1" {{ config.CATEGORY_HIERARCHY == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-card-footer tp-mt-md">
+                        <button class="tp-btn tp-btn--primary tp-btn--sm tp-save-section" type="button">{{ 'Save configuration'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    </div>
+                </div>
+            </div>
+
+            {# Event logging #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Event logging'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-alert tp-alert--info tp-mb-md">
+                        {{ 'Choose which events are saved to the DataLayer Log database. Events "purchase" and "refund" are always logged as they are business-critical.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </div>
+
+                    <div class="tp-grid tp-grid--2">
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">page_view</p>
+                                <p class="tp-switch-card-desc">{{ 'High volume — every page visit'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_PAGE_VIEW" value="1" {{ config.LOG_EVENT_PAGE_VIEW == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">view_item</p>
+                                <p class="tp-switch-card-desc">{{ 'Product page view'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_VIEW_ITEM" value="1" {{ config.LOG_EVENT_VIEW_ITEM == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">view_item_list</p>
+                                <p class="tp-switch-card-desc">{{ 'Category page — highest volume'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_VIEW_ITEM_LIST" value="1" {{ config.LOG_EVENT_VIEW_ITEM_LIST == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">select_item</p>
+                                <p class="tp-switch-card-desc">{{ 'Product click from listing'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_SELECT_ITEM" value="1" {{ config.LOG_EVENT_SELECT_ITEM == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">add_to_cart</p>
+                                <p class="tp-switch-card-desc">{{ 'Product added to cart'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_ADD_TO_CART" value="1" {{ config.LOG_EVENT_ADD_TO_CART == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">remove_from_cart</p>
+                                <p class="tp-switch-card-desc">{{ 'Product removed from cart'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_REMOVE_FROM_CART" value="1" {{ config.LOG_EVENT_REMOVE_FROM_CART == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">view_cart</p>
+                                <p class="tp-switch-card-desc">{{ 'Cart page view'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_VIEW_CART" value="1" {{ config.LOG_EVENT_VIEW_CART == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">begin_checkout</p>
+                                <p class="tp-switch-card-desc">{{ 'Checkout started'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_BEGIN_CHECKOUT" value="1" {{ config.LOG_EVENT_BEGIN_CHECKOUT == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">add_shipping_info</p>
+                                <p class="tp-switch-card-desc">{{ 'Shipping info added'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_ADD_SHIPPING_INFO" value="1" {{ config.LOG_EVENT_ADD_SHIPPING_INFO == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">add_payment_info</p>
+                                <p class="tp-switch-card-desc">{{ 'Payment info added'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_ADD_PAYMENT_INFO" value="1" {{ config.LOG_EVENT_ADD_PAYMENT_INFO == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">login</p>
+                                <p class="tp-switch-card-desc">{{ 'User logged in'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_LOGIN" value="1" {{ config.LOG_EVENT_LOGIN == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">sign_up</p>
+                                <p class="tp-switch-card-desc">{{ 'New account created'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_SIGN_UP" value="1" {{ config.LOG_EVENT_SIGN_UP == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">search</p>
+                                <p class="tp-switch-card-desc">{{ 'Site search performed'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="LOG_EVENT_SEARCH" value="1" {{ config.LOG_EVENT_SEARCH == '1' ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="tp-card-footer tp-mt-md">
+                        <button class="tp-btn tp-btn--primary tp-btn--sm tp-save-section" type="button">{{ 'Save configuration'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Sidebar #}
+        <div>
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Logging'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-switch-card tp-mb-md">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Log events'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Store dataLayer events in the database'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="LOG_EVENTS" value="1" {{ config.LOG_EVENTS == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="tp-form-group">
+                        <label class="tp-label">{{ 'Retention (days)'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                        <input type="number" class="tp-input" name="LOG_RETENTION_DAYS" value="{{ config.LOG_RETENTION_DAYS }}" min="1" max="365" style="max-width: 120px;">
+                    </div>
+
+                    <div class="tp-switch-card tp-mt-md">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ 'Debug mode'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-desc">{{ 'Show dataLayer output in browser console'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="DEBUG_MODE" value="1" {{ config.DEBUG_MODE == '1' ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'GA4 Events Reference'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body" style="font-size: 13px; line-height: 2;">
+                    <span class="tp-badge tp-event-type--ecommerce">{{ 'Ecommerce'|trans({}, 'Modules.Tagpilot.Admin') }}</span> view_item, add_to_cart, purchase<br>
+                    <span class="tp-badge tp-event-type--conversion">{{ 'Conversion'|trans({}, 'Modules.Tagpilot.Admin') }}</span> purchase, refund<br>
+                    <span class="tp-badge tp-event-type--engagement">{{ 'Engagement'|trans({}, 'Modules.Tagpilot.Admin') }}</span> login, sign_up, search<br>
+                    <span class="tp-badge tp-event-type--page">{{ 'Page'|trans({}, 'Modules.Tagpilot.Admin') }}</span> page_view
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

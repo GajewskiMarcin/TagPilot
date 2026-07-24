@@ -1,0 +1,172 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">TagPilot</h1>
+            <p class="tp-page-subtitle">{{ 'Google Tag Manager & GA4 Enhanced Ecommerce'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+        </div>
+        <div class="tp-page-actions">
+            <button class="tp-btn tp-btn--secondary" id="tp-purge-logs">{{ 'Purge old logs'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+            <button class="tp-btn tp-btn--danger" id="tp-purge-all-logs">{{ 'Delete all logs'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+        </div>
+    </div>
+
+    {# Connection status #}
+    {% if isEnabled and gtmId %}
+        <div class="tp-connection tp-connection--connected tp-mb-lg">
+            <div><span class="tp-dot tp-dot--success"></span></div>
+            <div class="tp-connection-info">
+                <h3 class="tp-connection-title">{{ 'GTM Connected'|trans({}, 'Modules.Tagpilot.Admin') }}</h3>
+                <p class="tp-connection-detail">
+                    {{ 'Container: %id%'|trans({'%id%': '<strong>' ~ gtmId ~ '</strong>'}, 'Modules.Tagpilot.Admin')|raw }}
+                    {% if ga4MeasurementId %} &middot; {{ 'GA4: %id%'|trans({'%id%': '<strong>' ~ ga4MeasurementId ~ '</strong>'}, 'Modules.Tagpilot.Admin')|raw }}{% endif %}
+                    {% if hasApiSecret %} &middot; <span class="tp-badge tp-badge--success">{{ 'Measurement Protocol active'|trans({}, 'Modules.Tagpilot.Admin') }}</span>{% endif %}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <div class="tp-connection tp-connection--disconnected tp-mb-lg">
+            <div><span class="tp-dot tp-dot--neutral"></span></div>
+            <div class="tp-connection-info">
+                <h3 class="tp-connection-title">{{ 'Not configured'|trans({}, 'Modules.Tagpilot.Admin') }}</h3>
+                <p class="tp-connection-detail">{{ 'Use the GTM Setup wizard to automatically configure your tracking.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+            </div>
+            <a href="{{ path('tagpilot_wizard') }}" class="tp-btn tp-btn--primary tp-btn--sm">{{ 'Setup wizard'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+        </div>
+    {% endif %}
+
+    {# Stats #}
+    <div class="tp-stats-grid">
+        <div class="tp-stat-card">
+            <p class="tp-stat-label">{{ 'Events today'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+            <p class="tp-stat-value">{{ stats.todayEvents }}</p>
+        </div>
+        <div class="tp-stat-card">
+            <p class="tp-stat-label">{{ 'Total events'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+            <p class="tp-stat-value">{{ stats.totalEvents }}</p>
+        </div>
+        <div class="tp-stat-card">
+            <p class="tp-stat-label">{{ 'Orders tracked'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+            <p class="tp-stat-value">{{ stats.totalOrders }}</p>
+        </div>
+        <div class="tp-stat-card">
+            <p class="tp-stat-label">{{ 'Sent via API'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+            <p class="tp-stat-value">{{ stats.sentMp }}</p>
+        </div>
+        <div class="tp-stat-card">
+            <p class="tp-stat-label">{{ 'Refunds'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+            <p class="tp-stat-value">{{ stats.refunds }}</p>
+        </div>
+    </div>
+
+    <div class="tp-grid tp-grid--sidebar">
+        {# Recent events #}
+        <div>
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Recent events'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                    <a href="{{ path('tagpilot_datalayer_log') }}" class="tp-btn tp-btn--ghost tp-btn--sm">{{ 'View all'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+                </div>
+                <div class="tp-card-body">
+                    {% if recentEvents|length > 0 %}
+                        <div class="tp-table-wrap">
+                            <table class="tp-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'ID'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                        <th>{{ 'Event'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                        <th>{{ 'URI'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                        <th>{{ 'Date'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in recentEvents %}
+                                    <tr>
+                                        <td class="tp-font-mono">{{ log.id_event_log }}</td>
+                                        <td><span class="tp-badge tp-badge--info">{{ log.event }}</span></td>
+                                        <td class="tp-text-sm tp-text-muted" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ log.uri }}</td>
+                                        <td class="tp-text-sm tp-text-muted">{{ log.date_add }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="tp-empty">
+                            <p class="tp-empty-title">{{ 'No events yet'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-empty-text">{{ 'Events will appear here once tracking is active.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Recent orders #}
+        <div>
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Recent orders'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                    <a href="{{ path('tagpilot_order_log') }}" class="tp-btn tp-btn--ghost tp-btn--sm">{{ 'View all'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+                </div>
+                <div class="tp-card-body">
+                    {% if recentOrders|length > 0 %}
+                        {% for log in recentOrders %}
+                            <div class="tp-flex-between" style="padding: 8px 0; border-bottom: 1px solid var(--tp-border-light);">
+                                <div>
+                                    <span class="tp-text-sm" style="font-weight: 600;">#{{ log.id_order }}</span>
+                                    <span class="tp-text-xs tp-text-muted">{{ log.order_reference }}</span>
+                                </div>
+                                <div class="tp-flex tp-gap-sm" style="align-items: center;">
+                                    {% if log.is_refund == '1' %}
+                                        <span class="tp-badge tp-badge--warning">{{ 'Refund'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% endif %}
+                                    {% if log.sent_mp == '1' %}
+                                        <span class="tp-badge tp-badge--success">{{ 'API'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% else %}
+                                        <span class="tp-badge tp-badge--neutral">{{ 'Client'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% endif %}
+                                    <span class="tp-text-sm" style="font-weight: 600;">{{ log.total }} zl</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="tp-empty">
+                            <p class="tp-empty-title">{{ 'No orders tracked'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-empty-text">{{ 'Purchase events will appear here.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Quick info #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Tracking modes'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body" style="font-size: 13px; color: var(--tp-text-secondary);">
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span>{{ 'Client-side GTM'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if isEnabled and gtmId %}
+                            <span class="tp-badge tp-badge--success">{{ 'Active'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Inactive'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span>{{ 'Server-side API'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if hasApiSecret %}
+                            <span class="tp-badge tp-badge--success">{{ 'Active'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Not configured'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between">
+                        <span>{{ 'Consent Mode v2'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-badge tp-badge--info">{{ 'Supported'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

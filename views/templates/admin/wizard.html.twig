@@ -1,0 +1,226 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'GTM Auto-Setup'|trans({}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ 'Connect your Google Tag Manager and configure tracking in 3 steps'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+        </div>
+    </div>
+
+    {# Stepper #}
+    <div class="tp-wizard-steps tp-mb-lg">
+        <div class="tp-wizard-step{% if step >= 1 %} tp-wizard-step--active{% endif %}{% if step > 1 %} tp-wizard-step--done{% endif %}">
+            <div class="tp-wizard-step-num">{% if step > 1 %}&#10003;{% else %}1{% endif %}</div>
+            <div class="tp-wizard-step-label">{{ 'Connect Google'|trans({}, 'Modules.Tagpilot.Admin') }}</div>
+        </div>
+        <div class="tp-wizard-step-line{% if step > 1 %} tp-wizard-step-line--active{% endif %}"></div>
+        <div class="tp-wizard-step{% if step >= 2 %} tp-wizard-step--active{% endif %}{% if step > 2 %} tp-wizard-step--done{% endif %}">
+            <div class="tp-wizard-step-num">{% if step > 2 %}&#10003;{% else %}2{% endif %}</div>
+            <div class="tp-wizard-step-label">{{ 'Choose Container'|trans({}, 'Modules.Tagpilot.Admin') }}</div>
+        </div>
+        <div class="tp-wizard-step-line{% if step > 2 %} tp-wizard-step-line--active{% endif %}"></div>
+        <div class="tp-wizard-step{% if step >= 3 %} tp-wizard-step--active{% endif %}">
+            <div class="tp-wizard-step-num">{% if gtmConfigured %}&#10003;{% else %}3{% endif %}</div>
+            <div class="tp-wizard-step-label">{{ 'Activate'|trans({}, 'Modules.Tagpilot.Admin') }}</div>
+        </div>
+    </div>
+
+    {# ── STEP 1: Connect Google ──────────────────────────────── #}
+    <div class="tp-card tp-mb-lg" id="tp-wizard-step1"{% if step > 1 and gtmConfigured %} style="display:none"{% endif %}>
+        <div class="tp-card-header">
+            <h2 class="tp-card-title">{{ 'Step 1: Connect your Google account'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+        </div>
+        <div class="tp-card-body">
+            {% if not isOAuthConfigured %}
+                <div class="tp-alert tp-alert--info tp-mb-md">
+                    <strong>{{ 'One-time setup:'|trans({}, 'Modules.Tagpilot.Admin') }}</strong> {{ 'Enter your Google Cloud OAuth2 credentials. You need a project with the Tag Manager API enabled.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    <br><small>{{ 'Go to'|trans({}, 'Modules.Tagpilot.Admin') }} <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">{{ 'Google Cloud Console'|trans({}, 'Modules.Tagpilot.Admin') }}</a> &rarr; {{ 'Create OAuth 2.0 Client ID (Web application)'|trans({}, 'Modules.Tagpilot.Admin') }} &rarr; {{ 'Add the redirect URI shown below.'|trans({}, 'Modules.Tagpilot.Admin') }}</small>
+                </div>
+
+                <div class="tp-form-group tp-mb-sm">
+                    <label class="tp-label">{{ 'Redirect URI'|trans({}, 'Modules.Tagpilot.Admin') }} <small>({{ 'add this to your Google OAuth app'|trans({}, 'Modules.Tagpilot.Admin') }})</small></label>
+                    <div class="tp-input-copy">
+                        <input type="text" class="tp-input" readonly value="{{ app.request.schemeAndHttpHost }}/module/tagpilot/oauthcallback" id="tp-redirect-uri">
+                        <button type="button" class="tp-btn tp-btn--ghost tp-btn--sm" onclick="navigator.clipboard.writeText(document.getElementById('tp-redirect-uri').value); TagPilot.toast('Copied!', 'success');">{{ 'Copy'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    </div>
+                </div>
+
+                <div class="tp-form-row">
+                    <div class="tp-form-group">
+                        <label class="tp-label">{{ 'Client ID'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                        <input type="text" class="tp-input" id="tp-oauth-client-id" placeholder="xxxx.apps.googleusercontent.com">
+                    </div>
+                    <div class="tp-form-group">
+                        <label class="tp-label">{{ 'Client Secret'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                        <input type="password" class="tp-input" id="tp-oauth-client-secret" placeholder="GOCSPX-...">
+                    </div>
+                </div>
+
+                <button class="tp-btn tp-btn--primary tp-mt-sm" id="tp-save-oauth-creds">{{ 'Save credentials'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+            {% else %}
+                {% if isConnected %}
+                    <div class="tp-connection tp-connection--connected">
+                        <div><span class="tp-dot tp-dot--success"></span></div>
+                        <div class="tp-connection-info">
+                            <h3 class="tp-connection-title">{{ 'Google account connected'|trans({}, 'Modules.Tagpilot.Admin') }}</h3>
+                            <p class="tp-connection-detail">{{ 'OAuth2 authentication is active. You can manage your GTM containers.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        </div>
+                        <button class="tp-btn tp-btn--ghost tp-btn--sm" id="tp-disconnect-google">{{ 'Disconnect'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    </div>
+                {% else %}
+                    <p class="tp-text-secondary tp-mb-md">{{ 'OAuth credentials are saved. Click below to authorize TagPilot to access your GTM account.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    <button class="tp-btn tp-btn--primary" id="tp-connect-google">
+                        <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right:8px;vertical-align:middle"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+                        {{ 'Connect with Google'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </button>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── STEP 2: Choose Container ────────────────────────────── #}
+    <div class="tp-card tp-mb-lg" id="tp-wizard-step2"{% if step < 2 %} style="opacity:0.5;pointer-events:none"{% endif %}>
+        <div class="tp-card-header">
+            <h2 class="tp-card-title">{{ 'Step 2: Choose GTM container & GA4 property'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+        </div>
+        <div class="tp-card-body">
+            <div class="tp-form-row">
+                <div class="tp-form-group">
+                    <label class="tp-label">{{ 'GTM Account'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                    <select class="tp-select" id="tp-gtm-account">
+                        <option value="">{{ '-- Select account --'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                        {% for account in accounts %}
+                            <option value="{{ account.accountId }}"{% if account.accountId == selectedAccountId %} selected{% endif %}>
+                                {{ account.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="tp-form-group">
+                    <label class="tp-label">{{ 'GTM Container'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                    <select class="tp-select" id="tp-gtm-container" disabled
+                            data-selected="{{ selectedContainerId }}">
+                        <option value="">{{ '-- Select container --'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tp-form-group tp-mt-sm">
+                <label class="tp-label">{{ 'GA4 Measurement ID'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                <input type="text" class="tp-input" id="tp-ga4-measurement-id" placeholder="G-XXXXXXXXXX" value="{{ ga4MeasurementId }}">
+                <small class="tp-help-text">{{ 'Find it in GA4 → Admin → Data Streams → your stream'|trans({}, 'Modules.Tagpilot.Admin') }}</small>
+            </div>
+
+            <div class="tp-divider tp-mt-md tp-mb-md"></div>
+
+            <details class="tp-details">
+                <summary class="tp-details-summary">{{ 'Google Ads Conversion Tracking (optional)'|trans({}, 'Modules.Tagpilot.Admin') }}</summary>
+                <div class="tp-details-body">
+                    <p class="tp-text-secondary tp-text-sm tp-mb-sm">{{ 'Add your Google Ads conversion details to track purchases as conversions and enable remarketing.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    <div class="tp-form-row">
+                        <div class="tp-form-group">
+                            <label class="tp-label">{{ 'Conversion ID'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                            <input type="text" class="tp-input" id="tp-ads-conversion-id" placeholder="AW-XXXXXXXXX" value="{{ adsConversionId }}">
+                        </div>
+                        <div class="tp-form-group">
+                            <label class="tp-label">{{ 'Conversion Label'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
+                            <input type="text" class="tp-input" id="tp-ads-conversion-label" placeholder="xXxXxXxXxXx" value="{{ adsConversionLabel }}">
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    {# ── STEP 3: Activate ────────────────────────────────────── #}
+    <div class="tp-card tp-mb-lg" id="tp-wizard-step3"{% if step < 2 %} style="opacity:0.5;pointer-events:none"{% endif %}>
+        <div class="tp-card-header">
+            <h2 class="tp-card-title">{{ 'Step 3: Configure & Publish'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+        </div>
+        <div class="tp-card-body">
+            {% if gtmConfigured %}
+                <div class="tp-connection tp-connection--connected tp-mb-md">
+                    <div><span class="tp-dot tp-dot--success"></span></div>
+                    <div class="tp-connection-info">
+                        <h3 class="tp-connection-title">{{ 'GTM auto-configured'|trans({}, 'Modules.Tagpilot.Admin') }}</h3>
+                        <p class="tp-connection-detail">
+                            {{ 'Container: %id% (%name%)'|trans({'%id%': gtmId, '%name%': selectedContainerName}, 'Modules.Tagpilot.Admin') }}
+                            {% if lastPublish %} &middot; {{ 'Last published: %date%'|trans({'%date%': lastPublish}, 'Modules.Tagpilot.Admin') }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                {# Show created entities #}
+                {% if entities.tags|length > 0 %}
+                <div class="tp-mb-md">
+                    <h3 class="tp-text-sm" style="font-weight:600;margin-bottom:8px;">{{ 'Created Tags (%count%)'|trans({'%count%': entities.tags|length}, 'Modules.Tagpilot.Admin') }}</h3>
+                    <div class="tp-tag-list">
+                        {% for tag in entities.tags %}
+                            <span class="tp-badge tp-badge--info">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if entities.triggers|length > 0 %}
+                <div class="tp-mb-md">
+                    <h3 class="tp-text-sm" style="font-weight:600;margin-bottom:8px;">{{ 'Created Triggers (%count%)'|trans({'%count%': entities.triggers|length}, 'Modules.Tagpilot.Admin') }}</h3>
+                    <div class="tp-tag-list">
+                        {% for trigger in entities.triggers %}
+                            <span class="tp-badge tp-badge--neutral">{{ trigger.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if entities.variables|length > 0 %}
+                <div class="tp-mb-md">
+                    <h3 class="tp-text-sm" style="font-weight:600;margin-bottom:8px;">{{ 'Created Variables (%count%)'|trans({'%count%': entities.variables|length}, 'Modules.Tagpilot.Admin') }}</h3>
+                    <div class="tp-tag-list">
+                        {% for variable in entities.variables %}
+                            <span class="tp-badge tp-badge--neutral">{{ variable.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="tp-flex tp-gap-sm tp-mt-md">
+                    <button class="tp-btn tp-btn--primary" id="tp-publish-gtm">{{ 'Publish to GTM'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                    <button class="tp-btn tp-btn--secondary" id="tp-reconfigure-gtm">{{ 'Reconfigure'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+                </div>
+            {% else %}
+                <p class="tp-text-secondary tp-mb-md">
+                    {{ 'Select your GTM account and container above, enter your GA4 Measurement ID, then click the button below. TagPilot will automatically create all necessary tags, triggers and variables in your GTM container.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                </p>
+
+                <div class="tp-alert tp-alert--info tp-mb-md">
+                    <strong>{{ 'What will be created:'|trans({}, 'Modules.Tagpilot.Admin') }}</strong>
+                    <ul style="margin:8px 0 0 16px;padding:0;">
+                        <li>{{ '1x GA4 Configuration tag'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                        <li>{{ '15x GA4 Event tags (page_view, purchase, add_to_cart, etc.)'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                        <li>{{ '15x Custom Event triggers'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                        <li>{{ '10x DataLayer variables'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                        <li>{{ 'Google Ads Conversion + Remarketing (if configured)'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                    </ul>
+                </div>
+
+                <button class="tp-btn tp-btn--primary tp-btn--lg" id="tp-activate-gtm">
+                    {{ 'Activate tracking'|trans({}, 'Modules.Tagpilot.Admin') }}
+                </button>
+
+                <div id="tp-configure-result" class="tp-mt-md" style="display:none"></div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Result area for real-time feedback #}
+    <div id="tp-wizard-log" class="tp-card" style="display:none">
+        <div class="tp-card-header">
+            <h2 class="tp-card-title">{{ 'Configuration Log'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+        </div>
+        <div class="tp-card-body">
+            <pre class="tp-code" id="tp-wizard-log-content"></pre>
+        </div>
+    </div>
+{% endblock %}

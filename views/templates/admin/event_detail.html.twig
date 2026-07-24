@@ -1,0 +1,55 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'Event #%id%'|trans({'%id%': log.id_event_log}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ log.event }} &middot; {{ log.date_add }}</p>
+        </div>
+        <div class="tp-page-actions">
+            <a href="{{ path('tagpilot_datalayer_log') }}" class="tp-btn tp-btn--secondary">{{ 'Back to log'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+        </div>
+    </div>
+
+    <div class="tp-grid tp-grid--sidebar">
+        <div>
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'DataLayer (formatted)'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <pre class="tp-code" id="tp-json-formatted">{{ log.datalayer }}</pre>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Details'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'ID'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm tp-font-mono">{{ log.id_event_log }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Event'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-badge tp-badge--info">{{ log.event }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'URI'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm" style="word-break: break-all;">{{ log.uri }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Shop'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ log.id_shop }}</span>
+                    </div>
+                    <div class="tp-flex-between">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Date'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ log.date_add }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

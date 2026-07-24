@@ -1,0 +1,181 @@
+tagpilot_dashboard:
+    path: /tagpilot
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::dashboard'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_config:
+    path: /tagpilot/configuration
+    methods: [GET, POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::configuration'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_events:
+    path: /tagpilot/events
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::events'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_datalayer_log:
+    path: /tagpilot/datalayer-log
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::datalayerLog'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_order_log:
+    path: /tagpilot/order-log
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::orderLog'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_order_detail:
+    path: /tagpilot/order/{id}
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::orderDetail'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+    requirements:
+        id: \d+
+
+tagpilot_event_detail:
+    path: /tagpilot/event/{id}
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::eventDetail'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+    requirements:
+        id: \d+
+
+tagpilot_api_save_config:
+    path: /tagpilot/api/config
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::saveConfig'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_test_connection:
+    path: /tagpilot/api/test-connection
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::testConnection'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_resend_order:
+    path: /tagpilot/api/resend-order/{id}
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::resendOrder'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+    requirements:
+        id: \d+
+
+tagpilot_api_purge_logs:
+    path: /tagpilot/api/purge-logs
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::purgeLogs'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_debug:
+    path: /tagpilot/debug
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::debug'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_wizard:
+    path: /tagpilot/wizard
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::wizard'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_oauth_start:
+    path: /tagpilot/api/oauth/start
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::oauthStart'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_gtm_accounts:
+    path: /tagpilot/api/gtm/accounts
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmAccounts'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_gtm_containers:
+    path: /tagpilot/api/gtm/containers/{accountId}
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmContainers'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_gtm_configure:
+    path: /tagpilot/api/gtm/configure
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmConfigure'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_gtm_publish:
+    path: /tagpilot/api/gtm/publish
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmPublish'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_gtm_disconnect:
+    path: /tagpilot/api/gtm/disconnect
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmDisconnect'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_gtm_status:
+    path: /tagpilot/api/gtm/status
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmStatus'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_api_save_oauth_credentials:
+    path: /tagpilot/api/oauth/credentials
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::saveOAuthCredentials'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
+tagpilot_support:
+    path: /tagpilot/support
+    methods: [GET]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\TagPilotController::support'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot

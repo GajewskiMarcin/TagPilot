@@ -1,0 +1,1231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="modules/tagpilot" source-language="en-US" target-language="pl-PL" datatype="plaintext">
+    <body>
+      <trans-unit id="a9d286d9fe1cf6b4990089cc8fc602b6">
+        <source>%count% events recorded</source>
+        <target>%count% zarejestrowanych zdarzen</target>
+      </trans-unit>
+      <trans-unit id="f921c6516b0e33523b6d586a4f5983a3">
+        <source>%count% events remaining.</source>
+        <target>Pozostalo %count% zdarzen.</target>
+      </trans-unit>
+      <trans-unit id="aba84a09b8974b57464d968d69388dab">
+        <source>%count% orders tracked</source>
+        <target>%count% sledzonych zamowien</target>
+      </trans-unit>
+      <trans-unit id="57cce27b29be97ebb06744c2e9513b60">
+        <source>-- Select account --</source>
+        <target>-- Wybierz konto --</target>
+      </trans-unit>
+      <trans-unit id="2a26ff89db168afc14a29fe84d3bf808">
+        <source>-- Select container --</source>
+        <target>-- Wybierz kontener --</target>
+      </trans-unit>
+      <trans-unit id="cc42c440aca942ce1feebca2bcb48dac">
+        <source>10x DataLayer variables</source>
+        <target>10x zmiennych DataLayer</target>
+      </trans-unit>
+      <trans-unit id="5e27f2dffa75255fb3b2f0c272f06509">
+        <source>15x Custom Event triggers</source>
+        <target>15x wyzwalaczy Custom Event</target>
+      </trans-unit>
+      <trans-unit id="1d7d5459713ad03cb02d2e96d47f5efd">
+        <source>15x GA4 Event tags (page_view, purchase, add_to_cart, etc.)</source>
+        <target>15x tagow GA4 Event (page_view, purchase, add_to_cart itp.)</target>
+      </trans-unit>
+      <trans-unit id="569b95407e959fd9c11ec546701a6f99">
+        <source>1x GA4 Configuration tag</source>
+        <target>1x tag GA4 Configuration</target>
+      </trans-unit>
+      <trans-unit id="643bfdfa703080c9bfc296d501bc4d97">
+        <source>3-step setup wizard (Connect → Choose → Activate)</source>
+        <target>3-krokowy kreator (Polacz → Wybierz → Aktywuj)</target>
+      </trans-unit>
+      <trans-unit id="a13367a8e2a3f3bf4f3409079e3fdf87">
+        <source>Activate</source>
+        <target>Aktywuj</target>
+      </trans-unit>
+      <trans-unit id="5407873be0a15cb2f97fb910b1e4ee9e">
+        <source>Activate GTM &amp; GA4 tracking on the storefront</source>
+        <target>Aktywuj sledzenie GTM i GA4 w sklepie</target>
+      </trans-unit>
+      <trans-unit id="5693f155823805c62317da9abc2a4c61">
+        <source>Activate tracking</source>
+        <target>Aktywuj sledzenie</target>
+      </trans-unit>
+      <trans-unit id="4d3d769b812b6faa6b76e1a8abaece2d">
+        <source>Active</source>
+        <target>Aktywny</target>
+      </trans-unit>
+      <trans-unit id="2e6801089617fd5abd301a3333967673">
+        <source>Add the redirect URI shown below.</source>
+        <target>Dodaj ponizszy redirect URI.</target>
+      </trans-unit>
+      <trans-unit id="24771d11f96b7164bba3373736037a0e">
+        <source>add this to your Google OAuth app</source>
+        <target>dodaj to do aplikacji Google OAuth</target>
+      </trans-unit>
+      <trans-unit id="8453c5b038aa9c3b1c3d06c43656bd39">
+        <source>Add your Google Ads conversion details to track purchases as conversions and enable remarketing.</source>
+        <target>Dodaj dane konwersji Google Ads, aby sledzic zakupy jako konwersje i wlaczyc remarketing.</target>
+      </trans-unit>
+      <trans-unit id="ba41f93c5c3491d794a1d4e67ebe9acc">
+        <source>AFL 3.0 (open source)</source>
+        <target>AFL 3.0 (open source)</target>
+      </trans-unit>
+      <trans-unit id="1aafb073a1a78e52e044177f67da6615">
+        <source>All events</source>
+        <target>Wszystkie zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="772a775b62c65e1795dbf16972537774">
+        <source>Always (when logged in)</source>
+        <target>Zawsze (gdy zalogowany)</target>
+      </trans-unit>
+      <trans-unit id="db974238714ca8de634a7ce1d083a14f">
+        <source>API</source>
+        <target>API</target>
+      </trans-unit>
+      <trans-unit id="1ddec0f92f297e937bdf409977df0c02">
+        <source>API Secret</source>
+        <target>API Secret</target>
+      </trans-unit>
+      <trans-unit id="d6058fca1b82740503338212edd7f346">
+        <source>Are you sure you want to re-send this order to GA4?</source>
+        <target>Czy na pewno chcesz ponownie wyslac to zamowienie do GA4?</target>
+      </trans-unit>
+      <trans-unit id="e7c305b7e4c87c3bdc2016e7df5b03af">
+        <source>Back to log</source>
+        <target>Powrot do logu</target>
+      </trans-unit>
+      <trans-unit id="9390390581f54c65d6acfc8da4e17362">
+        <source>Back to orders</source>
+        <target>Powrot do zamowien</target>
+      </trans-unit>
+      <trans-unit id="51717730cc3164d338edc98ae3dc493a">
+        <source>Cart page viewed</source>
+        <target>Wyswietlenie strony koszyka</target>
+      </trans-unit>
+      <trans-unit id="e4ff4e67c0112a4596dae378fa4b0b2f">
+        <source>Category / search results</source>
+        <target>Kategoria / wyniki wyszukiwania</target>
+      </trans-unit>
+      <trans-unit id="cbf9fa80d17e1be66aef22a27fe5a4f8">
+        <source>Category hierarchy</source>
+        <target>Hierarchia kategorii</target>
+      </trans-unit>
+      <trans-unit id="c49182dc0c7a70b9cd2e10853d9ec6c7">
+        <source>Changelog</source>
+        <target>Historia zmian</target>
+      </trans-unit>
+      <trans-unit id="1af0fc634d5c8078a801aab74f2d7503">
+        <source>Checkout started</source>
+        <target>Rozpoczecie zamowienia</target>
+      </trans-unit>
+      <trans-unit id="57e6f4c6122b2968ad80b6bf3b58cd05">
+        <source>Choose Container</source>
+        <target>Wybierz kontener</target>
+      </trans-unit>
+      <trans-unit id="577d7068826de925ea2aec01dbadf5e4">
+        <source>Client</source>
+        <target>Klient</target>
+      </trans-unit>
+      <trans-unit id="76525f0f34b48475e5ca33f71d296f3b">
+        <source>Client ID</source>
+        <target>Client ID</target>
+      </trans-unit>
+      <trans-unit id="734082edf44417dd19cc65943aa65c36">
+        <source>Client Secret</source>
+        <target>Client Secret</target>
+      </trans-unit>
+      <trans-unit id="9ec9eaf868d62e1c3278f9bfe7993006">
+        <source>Client-side GTM</source>
+        <target>GTM po stronie klienta</target>
+      </trans-unit>
+      <trans-unit id="df9c715f20aaf58fb3926cc02b08ec53">
+        <source>Compatibility</source>
+        <target>Kompatybilnosc</target>
+      </trans-unit>
+      <trans-unit id="254f642527b45bc260048e30704edb39">
+        <source>Configuration</source>
+        <target>Konfiguracja</target>
+      </trans-unit>
+      <trans-unit id="4c1565d4a3eb158fd5a7d58c34c5d7f6">
+        <source>Configuration complete!</source>
+        <target>Konfiguracja zakonczona!</target>
+      </trans-unit>
+      <trans-unit id="9c2a94a07f382b5ad19173a74b1ef6c6">
+        <source>Configuration failed</source>
+        <target>Konfiguracja nie powiodla sie</target>
+      </trans-unit>
+      <trans-unit id="176d5c48f4d67eb7a9c849b638092f37">
+        <source>Configuration Log</source>
+        <target>Log konfiguracji</target>
+      </trans-unit>
+      <trans-unit id="e60263ac381ae4a9ad460a5c706b9b5a">
+        <source>Configuration saved</source>
+        <target>Konfiguracja zapisana</target>
+      </trans-unit>
+      <trans-unit id="cc5fa2420449a50e70be6faa5896f260">
+        <source>Configure which GA4 ecommerce events to track</source>
+        <target>Skonfiguruj, ktore zdarzenia GA4 ecommerce sledzic</target>
+      </trans-unit>
+      <trans-unit id="61aa63eb3ac1c3408640463ee5fe8aa3">
+        <source>Configured</source>
+        <target>Skonfigurowany</target>
+      </trans-unit>
+      <trans-unit id="74867b21cbba0e55442cd81781e73789">
+        <source>Configuring GTM...</source>
+        <target>Konfigurowanie GTM...</target>
+      </trans-unit>
+      <trans-unit id="117aa4376715bfa2f7d85f5510e3ca26">
+        <source>Connect Google</source>
+        <target>Polacz Google</target>
+      </trans-unit>
+      <trans-unit id="534b5e5cd202747dbd4330b2c6fd5fc3">
+        <source>Connect with Google</source>
+        <target>Polacz z Google</target>
+      </trans-unit>
+      <trans-unit id="21193eb684839d3499f3fff82d33a3e2">
+        <source>Connect your Google Tag Manager and configure tracking in 3 steps</source>
+        <target>Polacz Google Tag Manager i skonfiguruj sledzenie w 3 krokach</target>
+      </trans-unit>
+      <trans-unit id="2ec0d16e4ca169baedb9b2d50ec5c6d7">
+        <source>Connected</source>
+        <target>Polaczony</target>
+      </trans-unit>
+      <trans-unit id="1be415f041c0d8f2e10093a7b4236694">
+        <source>Connection failed</source>
+        <target>Polaczenie nie powiodlo sie</target>
+      </trans-unit>
+      <trans-unit id="6e8633b7d3e3f587e566c39e7a75fb0a">
+        <source>Consent Mode v2</source>
+        <target>Consent Mode v2</target>
+      </trans-unit>
+      <trans-unit id="039656364580ecce0ed8550334284a08">
+        <source>Container: %id%</source>
+        <target>Kontener: %id%</target>
+      </trans-unit>
+      <trans-unit id="e1ccf8a76c80703babf64faecccd25a0">
+        <source>Container: %id% (%name%)</source>
+        <target>Kontener: %id% (%name%)</target>
+      </trans-unit>
+      <trans-unit id="3bb1503332637805beddb73a2dd1fe1b">
+        <source>Conversion</source>
+        <target>Konwersja</target>
+      </trans-unit>
+      <trans-unit id="8a888d1a266b0db5faa83e1631487a18">
+        <source>Conversion events</source>
+        <target>Zdarzenia konwersji</target>
+      </trans-unit>
+      <trans-unit id="cd02ce9aefb46ba77208e4c6eb2fc7a3">
+        <source>Conversion ID</source>
+        <target>Conversion ID</target>
+      </trans-unit>
+      <trans-unit id="274145361b9f41174a51e0820e4982b6">
+        <source>Conversion Label</source>
+        <target>Conversion Label</target>
+      </trans-unit>
+      <trans-unit id="5fb63579fc981698f97d55bfecb213ea">
+        <source>Copy</source>
+        <target>Skopiuj</target>
+      </trans-unit>
+      <trans-unit id="d9b243483c9a9552e79fd9b5ba053a47">
+        <source>Could not start OAuth</source>
+        <target>Nie udalo sie rozpoczac OAuth</target>
+      </trans-unit>
+      <trans-unit id="76dec2898568509ee14b15faeb7f7f75">
+        <source>Create OAuth 2.0 Client ID (Web application)</source>
+        <target>Utworz OAuth 2.0 Client ID (Web application)</target>
+      </trans-unit>
+      <trans-unit id="0eceeb45861f9585dd7a97a3e36f85c6">
+        <source>Created</source>
+        <target>Utworzono</target>
+      </trans-unit>
+      <trans-unit id="9548d4dd155470fbb3fd2c817f533ee1">
+        <source>Created Tags (%count%)</source>
+        <target>Utworzone tagi (%count%)</target>
+      </trans-unit>
+      <trans-unit id="d75b6a7b8f3c8ec7b80c961c0d6b2553">
+        <source>Created Triggers (%count%)</source>
+        <target>Utworzone wyzwalacze (%count%)</target>
+      </trans-unit>
+      <trans-unit id="95cac2d5093feaf7e4f5f49fb5e2f2b0">
+        <source>Created Variables (%count%)</source>
+        <target>Utworzone zmienne (%count%)</target>
+      </trans-unit>
+      <trans-unit id="27c8372a659be5485d39cff18e63d3ba">
+        <source>Credentials saved! Reloading...</source>
+        <target>Dane uwierzytelniajace zapisane! Przeladowywanie...</target>
+      </trans-unit>
+      <trans-unit id="6016c2bb7bd8dd79293094d37ebfea3f">
+        <source>Customer data</source>
+        <target>Dane klienta</target>
+      </trans-unit>
+      <trans-unit id="0c45755dd166344bebfa414b1d0b4b28">
+        <source>Customer logged in</source>
+        <target>Klient zalogowany</target>
+      </trans-unit>
+      <trans-unit id="2938c7f7e560ed972f8a4f68e80ff834">
+        <source>Dashboard</source>
+        <target>Pulpit</target>
+      </trans-unit>
+      <trans-unit id="f3feabc37e3e5bbc9f70919215cbcf05">
+        <source>Data settings</source>
+        <target>Ustawienia danych</target>
+      </trans-unit>
+      <trans-unit id="7b1efe11eee5a189c475cc7235272284">
+        <source>DataLayer</source>
+        <target>DataLayer</target>
+      </trans-unit>
+      <trans-unit id="4b86818ae5419e09ad7d5f310c27269a">
+        <source>DataLayer &amp; Order log with event inspector</source>
+        <target>Log DataLayer i zamowien z inspektorem zdarzen</target>
+      </trans-unit>
+      <trans-unit id="67c9ef798a3085499c9eefd54a20ab11">
+        <source>DataLayer (formatted)</source>
+        <target>DataLayer (sformatowany)</target>
+      </trans-unit>
+      <trans-unit id="ff2efa5bcc121661c434800daeab77c0">
+        <source>DataLayer Log</source>
+        <target>Log DataLayer</target>
+      </trans-unit>
+      <trans-unit id="44749712dbec183e983dcd78a7736c41">
+        <source>Date</source>
+        <target>Data</target>
+      </trans-unit>
+      <trans-unit id="a603905470e2a5b8c13e96b579ef0dba">
+        <source>Debug</source>
+        <target>Debugowanie</target>
+      </trans-unit>
+      <trans-unit id="ec3028a12402ab7f43962a6f3a667b6e">
+        <source>Debug mode</source>
+        <target>Tryb debugowania</target>
+      </trans-unit>
+      <trans-unit id="4c62d644cbc24e2396cdc0b266fd7745">
+        <source>Default ad_storage</source>
+        <target>Domyslne ad_storage</target>
+      </trans-unit>
+      <trans-unit id="9ad367056a48e572b5626bcb4f209f65">
+        <source>Default analytics_storage</source>
+        <target>Domyslne analytics_storage</target>
+      </trans-unit>
+      <trans-unit id="865726b2885feef8e8b25b56a2d7c8f8">
+        <source>denied</source>
+        <target>denied</target>
+      </trans-unit>
+      <trans-unit id="3ec365dd533ddb7ef3d1c111186ce872">
+        <source>Details</source>
+        <target>Szczegoly</target>
+      </trans-unit>
+      <trans-unit id="36b64aad8a26246fe3ad4116a2b6f289">
+        <source>Diagnostics</source>
+        <target>Diagnostyka</target>
+      </trans-unit>
+      <trans-unit id="c98291e881ba6e9ff38b352abb11d2a3">
+        <source>Diagnostics and testing tools</source>
+        <target>Narzedzia diagnostyczne i testowe</target>
+      </trans-unit>
+      <trans-unit id="b9f5c797ebbf55adccdd8539a65a0241">
+        <source>Disabled</source>
+        <target>Wylaczony</target>
+      </trans-unit>
+      <trans-unit id="42ae25231906c83927831e0ef7c317ac">
+        <source>Disconnect</source>
+        <target>Rozlacz</target>
+      </trans-unit>
+      <trans-unit id="330c316c3107f1ba0d45b5179780bc0d">
+        <source>Disconnect Google account? You can reconnect later.</source>
+        <target>Rozlaczyc konto Google? Mozesz polaczyc sie ponownie pozniej.</target>
+      </trans-unit>
+      <trans-unit id="ef70e46fd3bbc21e3e1f0b6815e750c0">
+        <source>Disconnected</source>
+        <target>Rozlaczony</target>
+      </trans-unit>
+      <trans-unit id="f5ce9f5cb682a1f863d5a8c51ac28683">
+        <source>DL</source>
+        <target>DL</target>
+      </trans-unit>
+      <trans-unit id="d4fb1c9e3490ac53c027480e0cc550bf">
+        <source>Do you like TagPilot?</source>
+        <target>Podoba Ci sie TagPilot?</target>
+      </trans-unit>
+      <trans-unit id="a7b4930bf2fc5d57eec6b03097200152">
+        <source>EAN-13</source>
+        <target>EAN-13</target>
+      </trans-unit>
+      <trans-unit id="53ef2022ee91ccf50dd8b63da5a563b9">
+        <source>Ecommerce</source>
+        <target>Ecommerce</target>
+      </trans-unit>
+      <trans-unit id="7445bdb1f5b6bdea6c8ff1ce3d93b7d0">
+        <source>Ecommerce events</source>
+        <target>Zdarzenia ecommerce</target>
+      </trans-unit>
+      <trans-unit id="3073c83bd01613a4ac07050771b1d51f">
+        <source>Enable Consent Mode</source>
+        <target>Wlacz Consent Mode</target>
+      </trans-unit>
+      <trans-unit id="1f4c0a105b166288bb6222cf64eb83d4">
+        <source>Enable event logging in Configuration to start recording.</source>
+        <target>Wlacz logowanie zdarzen w Konfiguracji, aby rozpoczac rejestrowanie.</target>
+      </trans-unit>
+      <trans-unit id="a0ad4b91518fb733f64b1421cee44883">
+        <source>Enable tracking</source>
+        <target>Wlacz sledzenie</target>
+      </trans-unit>
+      <trans-unit id="00d23a76e43b46dae9ec7aa9dcbebb32">
+        <source>Enabled</source>
+        <target>Wlaczony</target>
+      </trans-unit>
+      <trans-unit id="f034ccfdba0f830ec14d37f73be77578">
+        <source>Engagement</source>
+        <target>Zaangazowanie</target>
+      </trans-unit>
+      <trans-unit id="6b6b3cd5d8bf4c13d266b3052463e2aa">
+        <source>Engagement &amp; page events</source>
+        <target>Zdarzenia zaangazowania i strony</target>
+      </trans-unit>
+      <trans-unit id="e3c50ef1772923e01bf656f261eb52f8">
+        <source>Enhanced Conversions (hashed user data)</source>
+        <target>Enhanced Conversions (hashowane dane uzytkownika)</target>
+      </trans-unit>
+      <trans-unit id="9add54a458f58e61b445f69a9c4c6a54">
+        <source>Enhanced Ecommerce</source>
+        <target>Enhanced Ecommerce</target>
+      </trans-unit>
+      <trans-unit id="4f83311a1f66b9ed32544f09651f0c78">
+        <source>Enter your API secret</source>
+        <target>Wprowadz swoj API secret</target>
+      </trans-unit>
+      <trans-unit id="ae1cbde40eaa7de50007909d3d81ef94">
+        <source>Enter your Google Cloud OAuth2 credentials. You need a project with the Tag Manager API enabled.</source>
+        <target>Wprowadz dane OAuth2 z Google Cloud. Potrzebujesz projektu z wlaczonym Tag Manager API.</target>
+      </trans-unit>
+      <trans-unit id="902b0d55fddef6f8d651fe1035b7d4bd">
+        <source>Error</source>
+        <target>Blad</target>
+      </trans-unit>
+      <trans-unit id="cf667bad7bb0126fea3d807bfeb4d09e">
+        <source>Error loading</source>
+        <target>Blad ladowania</target>
+      </trans-unit>
+      <trans-unit id="3615657ac5dfe45e52629c8211637111">
+        <source>Error loading containers</source>
+        <target>Blad ladowania kontenerow</target>
+      </trans-unit>
+      <trans-unit id="a4ecfc70574394990cf17bd83df499f7">
+        <source>Event</source>
+        <target>Zdarzenie</target>
+      </trans-unit>
+      <trans-unit id="3be59a8b04c3ca05d796f183a39f8104">
+        <source>Event #%id%</source>
+        <target>Zdarzenie #%id%</target>
+      </trans-unit>
+      <trans-unit id="88ee361b945e8b1325ca99c10ff3b1f4">
+        <source>Event log not found.</source>
+        <target>Nie znaleziono logu zdarzenia.</target>
+      </trans-unit>
+      <trans-unit id="87f9f735a1d36793ceaecd4e47124b63">
+        <source>Events</source>
+        <target>Zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="28a0701f19bb49e3546aa39bf0db9df2">
+        <source>Events logged</source>
+        <target>Zalogowane zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="df935f135e59408f940d494c2afdf125">
+        <source>Events today</source>
+        <target>Zdarzenia dzisiaj</target>
+      </trans-unit>
+      <trans-unit id="9caea21773001088727244e349449ea5">
+        <source>Events will appear here once tracking is active.</source>
+        <target>Zdarzenia pojawia sie tutaj, gdy sledzenie bedzie aktywne.</target>
+      </trans-unit>
+      <trans-unit id="239afefde6a49490d59d9d819d7ffe10">
+        <source>Every contribution motivates further development and adding new features</source>
+        <target>Kazde wsparcie motywuje do dalszego rozwoju i dodawania nowych funkcji</target>
+      </trans-unit>
+      <trans-unit id="ceaa0734f0b3c738120c67344d8f3ec1">
+        <source>Fail</source>
+        <target>Blad</target>
+      </trans-unit>
+      <trans-unit id="d7c8c85bf79bbe1b7188497c32c3b0ca">
+        <source>Failed</source>
+        <target>Niepowodzenie</target>
+      </trans-unit>
+      <trans-unit id="ea85879f1aeaddbd22d7339ab801a62b">
+        <source>Failed to purge logs</source>
+        <target>Nie udalo sie wyczyzcic logow</target>
+      </trans-unit>
+      <trans-unit id="147e032c9e4bff8511043000081656a0">
+        <source>Find it in GA4 → Admin → Data Streams → your stream</source>
+        <target>Znajdziesz w GA4 → Admin → Data Streams → Twoj strumien</target>
+      </trans-unit>
+      <trans-unit id="0ac517bb436cc14b7fd8c776febdec41">
+        <source>Fired on every page load</source>
+        <target>Uruchamiane przy kazdym zaladowaniu strony</target>
+      </trans-unit>
+      <trans-unit id="8533ff2c7adaac008cea2a5dfbbbcf66">
+        <source>First release</source>
+        <target>Pierwsze wydanie</target>
+      </trans-unit>
+      <trans-unit id="7c09b09e91118afdd7b49f63560113e2">
+        <source>Force re-send</source>
+        <target>Wymus ponowne wyslanie</target>
+      </trans-unit>
+      <trans-unit id="01aaeb7381b897e79783448f0b20cdff">
+        <source>Found in GA4 Admin &gt; Data Streams &gt; Web stream details</source>
+        <target>Znajdziesz w GA4 Admin &gt; Data Streams &gt; Web stream details</target>
+      </trans-unit>
+      <trans-unit id="e4083990fd104edbd1aa114de0fb78cc">
+        <source>Full Google Tag Manager integration with GA4 Enhanced Ecommerce, Measurement Protocol API &amp; Consent Mode v2.</source>
+        <target>Pelna integracja Google Tag Manager z GA4 Enhanced Ecommerce, Measurement Protocol API i Consent Mode v2.</target>
+      </trans-unit>
+      <trans-unit id="644d3c70d04904247e23cad84e1d8edc">
+        <source>GA4 Admin &gt; Data Streams &gt; Measurement Protocol API secrets</source>
+        <target>GA4 Admin &gt; Data Streams &gt; Measurement Protocol API secrets</target>
+      </trans-unit>
+      <trans-unit id="9b7806a0b301cdd521027004225921f0">
+        <source>GA4 API</source>
+        <target>GA4 API</target>
+      </trans-unit>
+      <trans-unit id="edaeb8e9dc9a2436134c57951a64634b">
+        <source>GA4 Ecommerce flow</source>
+        <target>Przeplyw GA4 Ecommerce</target>
+      </trans-unit>
+      <trans-unit id="b86672e8ae9c01332383d7d255596c5d">
+        <source>GA4 Enhanced Ecommerce — 15 events</source>
+        <target>GA4 Enhanced Ecommerce — 15 zdarzen</target>
+      </trans-unit>
+      <trans-unit id="294199f0e987b3aa6681f330f36b6030">
+        <source>GA4 Events Reference</source>
+        <target>Dokumentacja zdarzen GA4</target>
+      </trans-unit>
+      <trans-unit id="4b112316bced582c460369787eb68a5d">
+        <source>GA4 Measurement ID</source>
+        <target>GA4 Measurement ID</target>
+      </trans-unit>
+      <trans-unit id="baeb3a5bc39d2f548a326c653e5d1130">
+        <source>GA4 Measurement Protocol (Server-side)</source>
+        <target>GA4 Measurement Protocol (Server-side)</target>
+      </trans-unit>
+      <trans-unit id="64367669e62e373a43ef97085474938e">
+        <source>GA4 Measurement Protocol connection successful</source>
+        <target>Polaczenie z GA4 Measurement Protocol udane</target>
+      </trans-unit>
+      <trans-unit id="3468b5298397ad962a9e13e30def7f7b">
+        <source>GA4 Measurement Protocol docs</source>
+        <target>Dokumentacja GA4 Measurement Protocol</target>
+      </trans-unit>
+      <trans-unit id="27a1b995e9fb66248f571b0b3695270b">
+        <source>GA4: %id%</source>
+        <target>GA4: %id%</target>
+      </trans-unit>
+      <trans-unit id="0db377921f4ce762c62526131097968f">
+        <source>General</source>
+        <target>Ogolne</target>
+      </trans-unit>
+      <trans-unit id="b8a8900d8ad85bfc9496b0997264fb6c">
+        <source>GitHub — report a bug</source>
+        <target>GitHub — zglos blad</target>
+      </trans-unit>
+      <trans-unit id="26a3a8b2826080fe32d5aad5b0e0f728">
+        <source>GitHub — source code</source>
+        <target>GitHub — kod zrodlowy</target>
+      </trans-unit>
+      <trans-unit id="e43ec38a93023bde02ff70f28b925702">
+        <source>Go to</source>
+        <target>Przejdz do</target>
+      </trans-unit>
+      <trans-unit id="d760203bbcc492353c8b31b14d9ffbf7">
+        <source>Google account connected</source>
+        <target>Konto Google polaczone</target>
+      </trans-unit>
+      <trans-unit id="4482d71fd3d88162e4573289b59fa725">
+        <source>Google account connected successfully!</source>
+        <target>Konto Google polaczone pomyslnie!</target>
+      </trans-unit>
+      <trans-unit id="9dbb5c5dd72a17894347a038a51ca71d">
+        <source>Google Ads Conversion &amp; Remarketing tags</source>
+        <target>Tagi Google Ads Conversion i Remarketing</target>
+      </trans-unit>
+      <trans-unit id="4d7eee35ebc09b19ecf77c45519eb63e">
+        <source>Google Ads Conversion + Remarketing (if configured)</source>
+        <target>Google Ads Conversion + Remarketing (jesli skonfigurowano)</target>
+      </trans-unit>
+      <trans-unit id="f75390d41d28ccb66ebedfcebc87b8ea">
+        <source>Google Ads Conversion Tracking (optional)</source>
+        <target>Sledzenie konwersji Google Ads (opcjonalne)</target>
+      </trans-unit>
+      <trans-unit id="89786972ebb5d82191ae05695b18af61">
+        <source>Google Cloud Console</source>
+        <target>Google Cloud Console</target>
+      </trans-unit>
+      <trans-unit id="296279f2dd7efe91ba94c051a70c4909">
+        <source>Google Consent Mode v2</source>
+        <target>Google Consent Mode v2</target>
+      </trans-unit>
+      <trans-unit id="1d3c65b2b03ef35e14df6b163ea3a1f6">
+        <source>Google Tag Manager</source>
+        <target>Google Tag Manager</target>
+      </trans-unit>
+      <trans-unit id="5b2d0a647a8cb02a3661bfb240ce8ad4">
+        <source>Google Tag Manager &amp; GA4 Enhanced Ecommerce</source>
+        <target>Google Tag Manager &amp; GA4 Enhanced Ecommerce</target>
+      </trans-unit>
+      <trans-unit id="fc00fa278c75792efc28397308b9ad6e">
+        <source>granted</source>
+        <target>granted</target>
+      </trans-unit>
+      <trans-unit id="d56541fad31af838fca75c6ee4b4ac78">
+        <source>GTM Account</source>
+        <target>Konto GTM</target>
+      </trans-unit>
+      <trans-unit id="ce5fc02c8673c50ca336da1998539a63">
+        <source>GTM Admin API v2 auto-configuration (tags, triggers, variables)</source>
+        <target>Automatyczna konfiguracja GTM Admin API v2 (tagi, wyzwalacze, zmienne)</target>
+      </trans-unit>
+      <trans-unit id="2af8e3dac14c0355d40343600865d065">
+        <source>GTM Admin API v2 documentation</source>
+        <target>Dokumentacja GTM Admin API v2</target>
+      </trans-unit>
+      <trans-unit id="e6b81d08bd5d2fbb09df121ff6efbaa1">
+        <source>GTM API</source>
+        <target>GTM API</target>
+      </trans-unit>
+      <trans-unit id="215206e4eac062b2266b11b66681342a">
+        <source>GTM API connection</source>
+        <target>Polaczenie z GTM API</target>
+      </trans-unit>
+      <trans-unit id="167ebc5a37b72bf15fdaa4558738d39f">
+        <source>GTM auto-configured</source>
+        <target>GTM skonfigurowany automatycznie</target>
+      </trans-unit>
+      <trans-unit id="561af1e659a0409b0f21b58c46fe4655">
+        <source>GTM auto-configured! Click &quot;Publish&quot; to go live.</source>
+        <target>GTM skonfigurowany automatycznie! Kliknij „Opublikuj&quot;, aby wdrozyc.</target>
+      </trans-unit>
+      <trans-unit id="e1d8388a67fbc101603e93e9a9a2b5fb">
+        <source>GTM Auto-Setup</source>
+        <target>Automatyczna konfiguracja GTM</target>
+      </trans-unit>
+      <trans-unit id="e8e48fb7e66b8f46725348a7548cdf6a">
+        <source>GTM Connected</source>
+        <target>GTM polaczony</target>
+      </trans-unit>
+      <trans-unit id="bad405e8ae724c55f7a6117af2b449c1">
+        <source>GTM Container</source>
+        <target>Kontener GTM</target>
+      </trans-unit>
+      <trans-unit id="64a1add61bc90f440b8c3f7cc90f86a7">
+        <source>GTM Container ID</source>
+        <target>GTM Container ID</target>
+      </trans-unit>
+      <trans-unit id="67be3c9b90f7d3082d24cbb359b76f5d">
+        <source>GTM ID</source>
+        <target>GTM ID</target>
+      </trans-unit>
+      <trans-unit id="7f69de4ba9530b339b7c80b38af78fa6">
+        <source>GTM Setup</source>
+        <target>Konfiguracja GTM</target>
+      </trans-unit>
+      <trans-unit id="b718adec73e04ce3ec720dd11a06a308">
+        <source>ID</source>
+        <target>ID</target>
+      </trans-unit>
+      <trans-unit id="3cab03c00dbd11bc3569afa0748013f0">
+        <source>Inactive</source>
+        <target>Nieaktywny</target>
+      </trans-unit>
+      <trans-unit id="7dca189794a6022601a454ce17e69d38">
+        <source>Include item_category2..5 with parent categories</source>
+        <target>Dolacz item_category2..5 z kategoriami nadrzednymi</target>
+      </trans-unit>
+      <trans-unit id="7ca28cb5112b52d2ae6b47760c2105c4">
+        <source>Inject the GTM JavaScript snippet. Disable if loaded by another module.</source>
+        <target>Wstaw skrypt JavaScript GTM. Wylacz, jesli jest ladowany przez inny modul.</target>
+      </trans-unit>
+      <trans-unit id="cd7ba9900f8abd37f1a4fb4d0ad7965a">
+        <source>Last published: %date%</source>
+        <target>Ostatnia publikacja: %date%</target>
+      </trans-unit>
+      <trans-unit id="236d0eb7130ba05580fa0cb21f6b968d">
+        <source>Last update</source>
+        <target>Ostatnia aktualizacja</target>
+      </trans-unit>
+      <trans-unit id="794df3791a8c800841516007427a2aa3">
+        <source>License</source>
+        <target>Licencja</target>
+      </trans-unit>
+      <trans-unit id="3d803bb3dd14b45d569685d92896aa34">
+        <source>Load GTM script</source>
+        <target>Laduj skrypt GTM</target>
+      </trans-unit>
+      <trans-unit id="8524de963f07201e5c086830d370797f">
+        <source>Loading...</source>
+        <target>Ladowanie...</target>
+      </trans-unit>
+      <trans-unit id="ea5b1264d73b53b24df1c187447ff899">
+        <source>Log events</source>
+        <target>Loguj zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="8db7df66ab1d7ab5f1dc947acdb5fae4">
+        <source>Logging</source>
+        <target>Logowanie</target>
+      </trans-unit>
+      <trans-unit id="92206bafbb448f921d45d133a8519c81">
+        <source>Logs purged.</source>
+        <target>Logi wyczyszczone.</target>
+      </trans-unit>
+      <trans-unit id="8424103f61f43c77cc1d5bb77d7d7d1a">
+        <source>Measurement Protocol active</source>
+        <target>Measurement Protocol aktywny</target>
+      </trans-unit>
+      <trans-unit id="eb5534a6983af195fab96bffe2ca4549">
+        <source>Module enabled</source>
+        <target>Modul wlaczony</target>
+      </trans-unit>
+      <trans-unit id="b5d0f2ecb3b4dc0ee94911336f57e922">
+        <source>Module information</source>
+        <target>Informacje o module</target>
+      </trans-unit>
+      <trans-unit id="83b9cd6e2835cc74d06c8cb7a037b8cd">
+        <source>Module status</source>
+        <target>Status modulu</target>
+      </trans-unit>
+      <trans-unit id="42cd08444ffd9823bf4a06c4e5f8dec6">
+        <source>Network error</source>
+        <target>Blad sieci</target>
+      </trans-unit>
+      <trans-unit id="caab9191ca2d6ec31c61d29cd4e7576a">
+        <source>Never send</source>
+        <target>Nigdy nie wysylaj</target>
+      </trans-unit>
+      <trans-unit id="3d0251ee5f71755fa4f92de20ac65216">
+        <source>New account created</source>
+        <target>Utworzono nowe konto</target>
+      </trans-unit>
+      <trans-unit id="bafd7322c6e97d25b6299b5d6fe8920b">
+        <source>No</source>
+        <target>Nie</target>
+      </trans-unit>
+      <trans-unit id="2e7eecd37dd6c3fce15b411ca94531fa">
+        <source>No events logged</source>
+        <target>Brak zalogowanych zdarzen</target>
+      </trans-unit>
+      <trans-unit id="a528933c879576617de4562df59f3df1">
+        <source>No events recorded yet.</source>
+        <target>Nie zarejestrowano jeszcze zadnych zdarzen.</target>
+      </trans-unit>
+      <trans-unit id="2a2d2c75ec43014500ef2d5f400cf7d1">
+        <source>No events yet</source>
+        <target>Brak zdarzen</target>
+      </trans-unit>
+      <trans-unit id="aba6c567694eb3231659d53e2fa3663b">
+        <source>No hooks registered.</source>
+        <target>Brak zarejestrowanych hookow.</target>
+      </trans-unit>
+      <trans-unit id="57aff5a18790113a2135141f431d0935">
+        <source>No orders tracked</source>
+        <target>Brak sledzonych zamowien</target>
+      </trans-unit>
+      <trans-unit id="db3f921088947d83680a80a0285ef414">
+        <source>Not configured</source>
+        <target>Nie skonfigurowany</target>
+      </trans-unit>
+      <trans-unit id="7b277018e43d41bc445731092b91547d">
+        <source>Not connected</source>
+        <target>Nie polaczony</target>
+      </trans-unit>
+      <trans-unit id="d49dd1bc31e182fe0fb64b4d12389fba">
+        <source>not set</source>
+        <target>nie ustawiono</target>
+      </trans-unit>
+      <trans-unit id="081e3c330e147539eb77db265213ef27">
+        <source>OAuth credentials are saved. Click below to authorize TagPilot to access your GTM account.</source>
+        <target>Dane OAuth sa zapisane. Kliknij ponizej, aby autoryzowac TagPilot do dostepu do Twojego konta GTM.</target>
+      </trans-unit>
+      <trans-unit id="09d5be9502491cc75b2af65817caf499">
+        <source>OAuth error</source>
+        <target>Blad OAuth</target>
+      </trans-unit>
+      <trans-unit id="1823504785ca9ccab88ffe85edbd52ae">
+        <source>OAuth2 authentication is active. You can manage your GTM containers.</source>
+        <target>Uwierzytelnianie OAuth2 jest aktywne. Mozesz zarzadzac kontenerami GTM.</target>
+      </trans-unit>
+      <trans-unit id="d15305d7a4e34e02489c74a5ef542f36">
+        <source>Off</source>
+        <target>Wylaczony</target>
+      </trans-unit>
+      <trans-unit id="e0aa021e21dddbd6d8cecec71e9cf564">
+        <source>OK</source>
+        <target>OK</target>
+      </trans-unit>
+      <trans-unit id="521c36a31c2762741cf0f8890cbe05e3">
+        <source>On</source>
+        <target>Wlaczony</target>
+      </trans-unit>
+      <trans-unit id="1429aca355fb8707cf1f90a25419ee78">
+        <source>On purchase only</source>
+        <target>Tylko przy zakupie</target>
+      </trans-unit>
+      <trans-unit id="ae0e3a053d6d280834f0d61bf18e244e">
+        <source>One-time setup:</source>
+        <target>Jednorazowa konfiguracja:</target>
+      </trans-unit>
+      <trans-unit id="816880b74a861355f1f844dad6c8a19c">
+        <source>Order #%id%</source>
+        <target>Zamowienie #%id%</target>
+      </trans-unit>
+      <trans-unit id="dc644b51d0d599e236e3c9a29d727d21">
+        <source>Order confirmed (client + server-side)</source>
+        <target>Zamowienie potwierdzone (client + server-side)</target>
+      </trans-unit>
+      <trans-unit id="559e7ca805230fc80e3644f87bb3994d">
+        <source>Order date</source>
+        <target>Data zamowienia</target>
+      </trans-unit>
+      <trans-unit id="f5d74ea75357b5e139854c14f8e24fe3">
+        <source>Order details</source>
+        <target>Szczegoly zamowienia</target>
+      </trans-unit>
+      <trans-unit id="d79cf3f429596f77db95c65074663a54">
+        <source>Order ID</source>
+        <target>ID zamowienia</target>
+      </trans-unit>
+      <trans-unit id="62def8b27f56641ab2c8bcb505af38d1">
+        <source>Order Log</source>
+        <target>Log zamowien</target>
+      </trans-unit>
+      <trans-unit id="b4ca2491c86844f4d8dee64f8bc67b54">
+        <source>Order log not found.</source>
+        <target>Nie znaleziono logu zamowienia.</target>
+      </trans-unit>
+      <trans-unit id="dadf5a421d180330c07d91c63a2bf814">
+        <source>Order re-sent to GA4 successfully</source>
+        <target>Zamowienie ponownie wyslane do GA4</target>
+      </trans-unit>
+      <trans-unit id="86e051c5e99892f9e1efb6ec90284f88">
+        <source>Order refunded (server-side)</source>
+        <target>Zamowienie zwrocone (server-side)</target>
+      </trans-unit>
+      <trans-unit id="f04e3df2bc23ec74d42a4889fc5e25dc">
+        <source>Orders tracked</source>
+        <target>Sledzone zamowienia</target>
+      </trans-unit>
+      <trans-unit id="f0d5f8b89a0fc11152ecaf7858f8a1c0">
+        <source>Overview and quick status</source>
+        <target>Przeglad i szybki status</target>
+      </trans-unit>
+      <trans-unit id="193cfc9be3b995831c6af2fea6650e60">
+        <source>Page</source>
+        <target>Strona</target>
+      </trans-unit>
+      <trans-unit id="7210f9f6101d783570e2c3ac3ba05b51">
+        <source>Page %current% of %total% (%count% events)</source>
+        <target>Strona %current% z %total% (%count% zdarzen)</target>
+      </trans-unit>
+      <trans-unit id="e52c5c550642a5dd72d2eebb34049957">
+        <source>Page %current% of %total% (%count% orders)</source>
+        <target>Strona %current% z %total% (%count% zamowien)</target>
+      </trans-unit>
+      <trans-unit id="c453a4b8e8d98e82f35b67f433e3b4da">
+        <source>Payment</source>
+        <target>Platnosc</target>
+      </trans-unit>
+      <trans-unit id="0d3a6f5b1a4f2aa6cd8f302f3a650ac8">
+        <source>Payment method selected</source>
+        <target>Wybrano metode platnosci</target>
+      </trans-unit>
+      <trans-unit id="2fec392304a5c23ac138da22847f9b7c">
+        <source>PHP</source>
+        <target>PHP</target>
+      </trans-unit>
+      <trans-unit id="482eb36793174b12f46a9062e2607d44">
+        <source>Please enter both Client ID and Client Secret</source>
+        <target>Wprowadz Client ID oraz Client Secret</target>
+      </trans-unit>
+      <trans-unit id="ca8babc9aef4bf0c0f7c08aa6dc31860">
+        <source>Please select an account, container, and enter GA4 Measurement ID</source>
+        <target>Wybierz konto, kontener i wprowadz GA4 Measurement ID</target>
+      </trans-unit>
+      <trans-unit id="3e5c47415ce020bbcc77b1c158594355">
+        <source>pos: %pos%</source>
+        <target>poz: %pos%</target>
+      </trans-unit>
+      <trans-unit id="9f4ce5776592c2fb058d600e6a0d796c">
+        <source>Prices with tax</source>
+        <target>Ceny z podatkiem</target>
+      </trans-unit>
+      <trans-unit id="6354c00dadee375467a1b8bddfdc6aaa">
+        <source>Product added to cart</source>
+        <target>Produkt dodany do koszyka</target>
+      </trans-unit>
+      <trans-unit id="9d987b6af3a60899c2cf544bce90578d">
+        <source>Product click from listing</source>
+        <target>Klikniecie produktu z listy</target>
+      </trans-unit>
+      <trans-unit id="dbe1f8d7075643f46d46845f6e09472a">
+        <source>Product detail page</source>
+        <target>Strona szczegolowa produktu</target>
+      </trans-unit>
+      <trans-unit id="97f08a40f22a625d0cbfe03db3349108">
+        <source>Product ID</source>
+        <target>ID produktu</target>
+      </trans-unit>
+      <trans-unit id="58756ac4a56abc2ce6819ad610ab234b">
+        <source>Product identifier</source>
+        <target>Identyfikator produktu</target>
+      </trans-unit>
+      <trans-unit id="4f0d02dbdcd692390f47eaf03bf9d1a8">
+        <source>Product removed from cart</source>
+        <target>Produkt usuniety z koszyka</target>
+      </trans-unit>
+      <trans-unit id="ce56aa5b672fdc93e8b2933b84302123">
+        <source>Publish changes to your GTM container? This will make them live.</source>
+        <target>Opublikowac zmiany w kontenerze GTM? Beda widoczne na stronie.</target>
+      </trans-unit>
+      <trans-unit id="3e09627616ab9f56ae64e1d4ecb4d015">
+        <source>Publish failed</source>
+        <target>Publikacja nie powiodla sie</target>
+      </trans-unit>
+      <trans-unit id="48a330c4079e7fdb97413e61ef13247e">
+        <source>Publish to GTM</source>
+        <target>Opublikuj w GTM</target>
+      </trans-unit>
+      <trans-unit id="c80c3b1ebd6762d578cffbdf7b0e874e">
+        <source>Published to GTM!</source>
+        <target>Opublikowano w GTM!</target>
+      </trans-unit>
+      <trans-unit id="5773cb48daf66cc4f1a248a97eb791cb">
+        <source>Publishing...</source>
+        <target>Publikowanie...</target>
+      </trans-unit>
+      <trans-unit id="76b6a47a02685d51794b9fdb095512e5">
+        <source>Purchase</source>
+        <target>Zakup</target>
+      </trans-unit>
+      <trans-unit id="394b24f168dbdefec18e1e199f9eafe0">
+        <source>Purchase and refund events will appear here.</source>
+        <target>Zdarzenia zakupu i zwrotu pojawia sie tutaj.</target>
+      </trans-unit>
+      <trans-unit id="275b4e84e298d17f6dc4134e621437ed">
+        <source>Purchase events will appear here.</source>
+        <target>Zdarzenia zakupu pojawia sie tutaj.</target>
+      </trans-unit>
+      <trans-unit id="b963f5bb546bf39dfe14b68f1d52f686">
+        <source>Purge old event logs? This cannot be undone.</source>
+        <target>Wyczyzcic stare logi zdarzen? Tej operacji nie mozna cofnac.</target>
+      </trans-unit>
+      <trans-unit id="951a0dfe090f10333e37a4f30be7c3e5">
+        <source>Purge old logs</source>
+        <target>Wyczysc stare logi</target>
+      </trans-unit>
+      <trans-unit id="730428795d497baf61829e6d1d56c9a1">
+        <source>Re-send to GA4</source>
+        <target>Wyslij ponownie do GA4</target>
+      </trans-unit>
+      <trans-unit id="01680cbccccbec412cbf0c076b674a0a">
+        <source>Re-sent!</source>
+        <target>Ponownie wyslano!</target>
+      </trans-unit>
+      <trans-unit id="8a49eb08b253e801e86bcdc152e7187e">
+        <source>Recent events</source>
+        <target>Ostatnie zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="c6e7bf9d93a3bc8b059bf8a3983771da">
+        <source>Recent events (last 20)</source>
+        <target>Ostatnie zdarzenia (ostatnie 20)</target>
+      </trans-unit>
+      <trans-unit id="4bfa4ae25032dd489fe94435f47075c6">
+        <source>Recent orders</source>
+        <target>Ostatnie zamowienia</target>
+      </trans-unit>
+      <trans-unit id="bb2d5ec8a4ac86b6601dd938cbadef8b">
+        <source>Reconfigure</source>
+        <target>Rekonfiguruj</target>
+      </trans-unit>
+      <trans-unit id="88b61ef2893a568ff2010dc14fbe8f41">
+        <source>Reconfigure will create new tags/triggers in GTM. Continue?</source>
+        <target>Ponowna konfiguracja utworzy nowe tagi/wyzwalacze w GTM. Kontynuowac?</target>
+      </trans-unit>
+      <trans-unit id="27499763cc523271e74f32ff4f740a7f">
+        <source>Redirect URI</source>
+        <target>Redirect URI</target>
+      </trans-unit>
+      <trans-unit id="63d5049791d9d79d86e9a108b0a999ca">
+        <source>Reference</source>
+        <target>Referencja</target>
+      </trans-unit>
+      <trans-unit id="76f0ed934de85cc7131910b32ede7714">
+        <source>Refund</source>
+        <target>Zwrot</target>
+      </trans-unit>
+      <trans-unit id="53beb26d8bca00f56fbd295fdee83459">
+        <source>Refunds</source>
+        <target>Zwroty</target>
+      </trans-unit>
+      <trans-unit id="6002e8a05cabf46d5280828babc1fc41">
+        <source>Registered hooks</source>
+        <target>Zarejestrowane hooki</target>
+      </trans-unit>
+      <trans-unit id="e4b6a7c5c57f4e228bfb80dbe2007cf9">
+        <source>Resent</source>
+        <target>Ponowione</target>
+      </trans-unit>
+      <trans-unit id="0d6a90889ade51e4252ba8bbf1ad155e">
+        <source>Retention (days)</source>
+        <target>Okres przechowywania (dni)</target>
+      </trans-unit>
+      <trans-unit id="c9cc8cce247e49bae79f15173ce97354">
+        <source>Save</source>
+        <target>Zapisz</target>
+      </trans-unit>
+      <trans-unit id="cf565402d32b79d33f626252949a6941">
+        <source>Save configuration</source>
+        <target>Zapisz konfiguracje</target>
+      </trans-unit>
+      <trans-unit id="f0ac1c09e09fa027870950aa1151faa5">
+        <source>Save credentials</source>
+        <target>Zapisz dane uwierzytelniajace</target>
+      </trans-unit>
+      <trans-unit id="575f5f86d2c7ea113c6710c1037c4465">
+        <source>Saving...</source>
+        <target>Zapisywanie...</target>
+      </trans-unit>
+      <trans-unit id="9d9b4e82fd4fd5ed6523284d4608049f">
+        <source>Search performed</source>
+        <target>Wykonano wyszukiwanie</target>
+      </trans-unit>
+      <trans-unit id="5bb65c93189cc86a4949ba4fa74e8d06">
+        <source>Select your GTM account and container above, enter your GA4 Measurement ID, then click the button below. TagPilot will automatically create all necessary tags, triggers and variables in your GTM container.</source>
+        <target>Wybierz konto i kontener GTM powyzej, wprowadz GA4 Measurement ID, a nastepnie kliknij przycisk ponizej. TagPilot automatycznie utworzy wszystkie niezbedne tagi, wyzwalacze i zmienne w kontenerze GTM.</target>
+      </trans-unit>
+      <trans-unit id="718566707ffb49163309bb2c2eaa49f0">
+        <source>Send a test event to GA4 debug endpoint to verify your API secret.</source>
+        <target>Wyslij zdarzenie testowe do GA4, aby zweryfikowac API secret.</target>
+      </trans-unit>
+      <trans-unit id="c360bb5af085c2b07d4a0ae6d712785b">
+        <source>Send purchase events via Measurement Protocol API</source>
+        <target>Wysylaj zdarzenia zakupu przez Measurement Protocol API</target>
+      </trans-unit>
+      <trans-unit id="4820ae0d9b1e4889012304bbef0f1e98">
+        <source>Send refund events via Measurement Protocol API</source>
+        <target>Wysylaj zdarzenia zwrotu przez Measurement Protocol API</target>
+      </trans-unit>
+      <trans-unit id="5cb24e1b15f7faaae6f9f859a169bb6c">
+        <source>Send test event</source>
+        <target>Wyslij zdarzenie testowe</target>
+      </trans-unit>
+      <trans-unit id="7b0fee4d957f4ffc0ed5abdd184062b7">
+        <source>Sending...</source>
+        <target>Wysylanie...</target>
+      </trans-unit>
+      <trans-unit id="7f8c0283f16925caed8e632086b81b9c">
+        <source>Sent</source>
+        <target>Wyslane</target>
+      </trans-unit>
+      <trans-unit id="3599d3fed705c7b8e0ccadada0f32295">
+        <source>Sent via API</source>
+        <target>Wyslane przez API</target>
+      </trans-unit>
+      <trans-unit id="71c128dc15d712cb46a7525e064084c7">
+        <source>Server-side API</source>
+        <target>API po stronie serwera</target>
+      </trans-unit>
+      <trans-unit id="9b83b12de6871ecf7c051979bf5b591f">
+        <source>Server-side capable</source>
+        <target>Z mozliwoscia server-side</target>
+      </trans-unit>
+      <trans-unit id="b8464bebe3b92b93943f72f8aea9af75">
+        <source>Server-side purchase</source>
+        <target>Zakup server-side</target>
+      </trans-unit>
+      <trans-unit id="c12ebb1445e55c8612cf56f61af49f25">
+        <source>Server-side purchase events</source>
+        <target>Zdarzenia zakupu server-side</target>
+      </trans-unit>
+      <trans-unit id="787a6d785f5ec96d2786d5f28273e128">
+        <source>Server-side refund events</source>
+        <target>Zdarzenia zwrotu server-side</target>
+      </trans-unit>
+      <trans-unit id="24cd9973e9d0870f65ac6766ef0db001">
+        <source>Server-side tracking sends purchase and refund events directly to GA4 via API, bypassing ad-blockers and ensuring reliable conversion tracking.</source>
+        <target>Sledzenie server-side wysyla zdarzenia zakupu i zwrotu bezposrednio do GA4 przez API, omijajac blokady reklam i zapewniajac niezawodne sledzenie konwersji.</target>
+      </trans-unit>
+      <trans-unit id="a0bb22c6c3dd73988bbdd82f42227774">
+        <source>Server-side tracking via Measurement Protocol</source>
+        <target>Sledzenie server-side przez Measurement Protocol</target>
+      </trans-unit>
+      <trans-unit id="839fbd942d3095450b312dcb61fa5b47">
+        <source>Set default consent state. Your CMP should update consent via gtag().</source>
+        <target>Ustaw domyslny stan zgod. Twoj CMP powinien aktualizowac zgody przez gtag().</target>
+      </trans-unit>
+      <trans-unit id="47bd4f9dfe091c18bd54707c396315c3">
+        <source>Set up Google Tag Manager and GA4 Measurement Protocol</source>
+        <target>Skonfiguruj Google Tag Manager i GA4 Measurement Protocol</target>
+      </trans-unit>
+      <trans-unit id="c63de2366ee62d57bf85fa3c6a974b57">
+        <source>Setup wizard</source>
+        <target>Kreator konfiguracji</target>
+      </trans-unit>
+      <trans-unit id="09ffe72b2ac30942a745f762a6245a16">
+        <source>Shipping method selected</source>
+        <target>Wybrano metode dostawy</target>
+      </trans-unit>
+      <trans-unit id="9f82518d468b9fee614fcc92f76bb163">
+        <source>Shop</source>
+        <target>Sklep</target>
+      </trans-unit>
+      <trans-unit id="10f8947f72018c00a1486135b273d935">
+        <source>Show dataLayer output in browser console</source>
+        <target>Wyswietlaj dane DataLayer w konsoli przegladarki</target>
+      </trans-unit>
+      <trans-unit id="6bb33160d3e9968c9f988eee92002d1a">
+        <source>Starting auto-configuration...</source>
+        <target>Rozpoczynanie automatycznej konfiguracji...</target>
+      </trans-unit>
+      <trans-unit id="4fa365ebf873607fe0c1fcda925bc208">
+        <source>Step 1: Connect your Google account</source>
+        <target>Krok 1: Polacz konto Google</target>
+      </trans-unit>
+      <trans-unit id="573f75f2d4b9572459a3267552d89cfd">
+        <source>Step 2: Choose GTM container &amp; GA4 property</source>
+        <target>Krok 2: Wybierz kontener GTM i usluge GA4</target>
+      </trans-unit>
+      <trans-unit id="eedca5c21b6d20ae0ff3453964a5c285">
+        <source>Step 3: Configure &amp; Publish</source>
+        <target>Krok 3: Skonfiguruj i opublikuj</target>
+      </trans-unit>
+      <trans-unit id="1af249f055586a7b627d16e53a63e692">
+        <source>Store dataLayer events in the database</source>
+        <target>Zapisuj zdarzenia DataLayer w bazie danych</target>
+      </trans-unit>
+      <trans-unit id="db5eb84117d06047c97c9a0191b5fffe">
+        <source>Support</source>
+        <target>Wsparcie</target>
+      </trans-unit>
+      <trans-unit id="eaa4dc5078017a5c5bebf383ab6f5124">
+        <source>Supported</source>
+        <target>Obslugiwany</target>
+      </trans-unit>
+      <trans-unit id="d7aa51a9fae0cbade530f7fc919574ab">
+        <source>System status</source>
+        <target>Status systemu</target>
+      </trans-unit>
+      <trans-unit id="15bbe9f1388ff30cfb49a34a8b016bb1">
+        <source>t appear in GA4 after 48h, you can re-send it via Measurement Protocol.</source>
+        <target>nie pojawi sie w GA4 po 48h, mozesz wyslac je ponownie przez Measurement Protocol.</target>
+      </trans-unit>
+      <trans-unit id="687894637df99eb9b5300aa73e39b61a">
+        <source>t be preserved. If already sent, this may create a duplicate.</source>
+        <target>nie zostana zachowane. Jesli juz wyslano, moze to utworzyc duplikat.</target>
+      </trans-unit>
+      <trans-unit id="a9f576c6377f9958474ee0b00167474b">
+        <source>TagPilot is a free open source module</source>
+        <target>TagPilot to darmowy modul open source</target>
+      </trans-unit>
+      <trans-unit id="d5c9c200244a4d3863ce9552bdb0a155">
+        <source>TagPilot – GTM &amp; GA4 Ecommerce</source>
+        <target>TagPilot – GTM &amp; GA4 Ecommerce</target>
+      </trans-unit>
+      <trans-unit id="39838db537c95bc8df810c5601601d5b">
+        <source>Test connection</source>
+        <target>Testuj polaczenie</target>
+      </trans-unit>
+      <trans-unit id="0d51cbec8810c65f6210ee028110bfd1">
+        <source>Test Measurement Protocol</source>
+        <target>Testuj Measurement Protocol</target>
+      </trans-unit>
+      <trans-unit id="e6c2d5bbec8355bce182a24c2c21b8e8">
+        <source>This module is completely free and open source. If it saves you time and money, consider supporting its development with a coffee ☕</source>
+        <target>Ten modul jest calkowicie darmowy i open source. Jesli oszczedza Ci czas i pieniadze, rozwaz wsparcie jego rozwoju kawa ☕</target>
+      </trans-unit>
+      <trans-unit id="96b0141273eabab320119c467cdcaf17">
+        <source>Total</source>
+        <target>Suma</target>
+      </trans-unit>
+      <trans-unit id="9858f4be3157f9870d04ebf5868351ed">
+        <source>Total events</source>
+        <target>Suma zdarzen</target>
+      </trans-unit>
+      <trans-unit id="afd331ff5ed9930b945e17be4cb9a29d">
+        <source>Tracking modes</source>
+        <target>Tryby sledzenia</target>
+      </trans-unit>
+      <trans-unit id="a1fa27779242b4902f7ae3bdd5c6d508">
+        <source>Type</source>
+        <target>Typ</target>
+      </trans-unit>
+      <trans-unit id="aee9784c03b80d38d3271cde2b252b8d">
+        <source>Unknown error</source>
+        <target>Nieznany blad</target>
+      </trans-unit>
+      <trans-unit id="ff0a3b7f3daef040faf89a88fdac01b7">
+        <source>Updated</source>
+        <target>Zaktualizowano</target>
+      </trans-unit>
+      <trans-unit id="8447306210a0972ac94b7d774799df1a">
+        <source>URI</source>
+        <target>URI</target>
+      </trans-unit>
+      <trans-unit id="54013f7b4bf5677119a6ef0357c7d48c">
+        <source>Use tax-inclusive prices in dataLayer events</source>
+        <target>Uzywaj cen brutto w zdarzeniach DataLayer</target>
+      </trans-unit>
+      <trans-unit id="855281bc67f275cb4a63e891a29ca652">
+        <source>Use the GTM Setup wizard to automatically configure your tracking.</source>
+        <target>Uzyj kreatora GTM Setup, aby automatycznie skonfigurowac sledzenie.</target>
+      </trans-unit>
+      <trans-unit id="e9be76a44ba1c2521b80bc4a126e017a">
+        <source>Useful links</source>
+        <target>Przydatne linki</target>
+      </trans-unit>
+      <trans-unit id="bad0d8a56996a16e9cdac5335080e167">
+        <source>Validation errors</source>
+        <target>Bledy walidacji</target>
+      </trans-unit>
+      <trans-unit id="6194828398648da5c68a1001b57669af">
+        <source>Validation OK — no errors</source>
+        <target>Walidacja OK — brak bledow</target>
+      </trans-unit>
+      <trans-unit id="34b6cd75171affba6957e308dcbd92be">
+        <source>Version</source>
+        <target>Wersja</target>
+      </trans-unit>
+      <trans-unit id="4351cfebe4b61d8aa5efa1d020710005">
+        <source>View</source>
+        <target>Zobacz</target>
+      </trans-unit>
+      <trans-unit id="0b4db271fc4624853e634ef6882ea8be">
+        <source>View all</source>
+        <target>Zobacz wszystkie</target>
+      </trans-unit>
+      <trans-unit id="3f3e336e2f1fa10375efd923fca18b55">
+        <source>Warning:</source>
+        <target>Uwaga:</target>
+      </trans-unit>
+      <trans-unit id="e17fdb615452f440c793b5ddad90dd5e">
+        <source>Warnings</source>
+        <target>Ostrzezenia</target>
+      </trans-unit>
+      <trans-unit id="2f2fc76a133c16a8ea92300d31db6c58">
+        <source>What will be created:</source>
+        <target>Co zostanie utworzone:</target>
+      </trans-unit>
+      <trans-unit id="93cba07454f06a4a960172bbd6e2a435">
+        <source>Yes</source>
+        <target>Tak</target>
+      </trans-unit>
+      <trans-unit id="e4ea318c057864b3e3469c013e39da8d">
+        <source>Your Google Tag Manager container ID (e.g. GTM-ABC123)</source>
+        <target>Identyfikator kontenera Google Tag Manager (np. GTM-ABC123)</target>
+      </trans-unit>
+      <trans-unit id="a5472c755038d19511f6713772fd45c8">
+        <source>☕ Buy me a coffee</source>
+        <target>☕ Postaw mi kawe</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

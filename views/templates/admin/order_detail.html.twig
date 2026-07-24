@@ -1,0 +1,112 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'Order #%id%'|trans({'%id%': log.id_order}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ log.order_reference }} &middot; {{ log.date_order }}</p>
+        </div>
+        <div class="tp-page-actions">
+            <a href="{{ path('tagpilot_order_log') }}" class="tp-btn tp-btn--secondary">{{ 'Back to orders'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+        </div>
+    </div>
+
+    <div class="tp-grid tp-grid--sidebar">
+        <div>
+            {# DataLayer #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'DataLayer (formatted)'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <pre class="tp-code" id="tp-json-formatted">{{ log.datalayer }}</pre>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            {# Order info #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Order details'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Order ID'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm tp-font-mono" style="font-weight: 600;">{{ log.id_order }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Reference'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm tp-font-mono">{{ log.order_reference }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Total'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm" style="font-weight: 600;">{{ log.total }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Payment'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ log.payment }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Type'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if log.is_refund == '1' %}
+                            <span class="tp-badge tp-badge--warning">{{ 'Refund'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--info">{{ 'Purchase'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'DataLayer'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if log.dl_ok == '1' %}
+                            <span class="tp-badge tp-badge--success">{{ 'OK'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--danger">{{ 'Failed'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Sent via API'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if log.sent_mp == '1' %}
+                            <span class="tp-badge tp-badge--success">{{ 'Yes'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'No'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Resent'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ log.resent == '1' ? 'Yes'|trans({}, 'Modules.Tagpilot.Admin') : 'No'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'GTM ID'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm tp-font-mono">{{ log.gtm_id }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-sm">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Created'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ log.date_add }}</span>
+                    </div>
+                    <div class="tp-flex-between">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Updated'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ log.date_upd }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {# Re-send #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Force re-send'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <p class="tp-text-sm tp-text-muted tp-mb-md">
+                        {{ 'If this order doesn\'t appear in GA4 after 48h, you can re-send it via Measurement Protocol.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </p>
+                    <button class="tp-btn tp-btn--secondary tp-btn--sm" id="tp-resend-order" data-id="{{ log.id_order_log }}">
+                        {{ 'Re-send to GA4'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </button>
+                    <div class="tp-alert tp-alert--warning tp-mt-md" style="font-size: 12px;">
+                        <strong>{{ 'Warning:'|trans({}, 'Modules.Tagpilot.Admin') }}</strong> {{ 'The original date won\'t be preserved. If already sent, this may create a duplicate.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

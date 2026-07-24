@@ -1,0 +1,162 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <p class="tp-page-subtitle">{{ 'TagPilot is a free open source module'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+    </div>
+
+    <div class="tp-grid tp-grid--sidebar">
+        {# Buy me a coffee #}
+        <div class="tp-card" style="text-align: center; padding: 48px 32px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">☕</div>
+            <h2 class="tp-card-title" style="font-size: 22px; margin-bottom: 8px;">{{ 'Do you like TagPilot?'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+            <p class="tp-text-muted" style="margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                {{ 'This module is completely free and open source. If it saves you time and money, consider supporting its development with a coffee ☕'|trans({}, 'Modules.Tagpilot.Admin') }}
+            </p>
+            <a href="https://buymeacoffee.com/marcingajewski"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="tp-btn tp-btn--primary tp-btn--lg"
+               style="background: #FFDD00; color: #000000; font-weight: 600;">
+                {{ '☕ Buy me a coffee'|trans({}, 'Modules.Tagpilot.Admin') }}
+            </a>
+            <p class="tp-text-xs tp-text-muted tp-mt-md">
+                {{ 'Every contribution motivates further development and adding new features'|trans({}, 'Modules.Tagpilot.Admin') }}
+            </p>
+        </div>
+
+        {# Info column #}
+        <div>
+            <div class="tp-card tp-mb-md">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Module information'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Version'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm tp-font-mono">{{ moduleVersion }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Compatibility'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">PrestaShop 8.0 – 9.x</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'PHP'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">8.1+</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'License'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ 'AFL 3.0 (open source)'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'GTM API'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">Tag Manager API v2</span>
+                    </div>
+                    <div class="tp-flex-between">
+                        <span class="tp-text-sm tp-text-muted">{{ 'GA4 API'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">Measurement Protocol v2</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tp-card tp-mb-md">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Useful links'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body" style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="https://github.com/GajewskiMarcin/TagPilot" target="_blank" rel="noopener" class="tp-btn tp-btn--secondary tp-btn--sm">
+                        {{ 'GitHub — source code'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </a>
+                    <a href="https://github.com/GajewskiMarcin/TagPilot/issues" target="_blank" rel="noopener" class="tp-btn tp-btn--secondary tp-btn--sm">
+                        {{ 'GitHub — report a bug'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </a>
+                    <a href="https://developers.google.com/tag-platform/tag-manager/api/v2" target="_blank" rel="noopener" class="tp-btn tp-btn--secondary tp-btn--sm">
+                        {{ 'GTM Admin API v2 documentation'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </a>
+                    <a href="https://developers.google.com/analytics/devguides/collection/protocol/ga4" target="_blank" rel="noopener" class="tp-btn tp-btn--secondary tp-btn--sm">
+                        {{ 'GA4 Measurement Protocol docs'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </a>
+                    <a href="https://tagmanager.google.com/" target="_blank" rel="noopener" class="tp-btn tp-btn--secondary tp-btn--sm">
+                        {{ 'Google Tag Manager'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="tp-card tp-mb-md">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Diagnostics'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Module status'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if isEnabled %}
+                            <span class="tp-badge tp-badge--success">{{ 'Active'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Inactive'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'GTM Container'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm tp-font-mono">{{ gtmId|default('—') }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'GA4 Measurement ID'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm tp-font-mono">{{ ga4MeasurementId|default('—') }}</span>
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Server-side API'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if hasApiSecret %}
+                            <span class="tp-badge tp-badge--success">{{ 'Configured'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Not configured'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'GTM API connection'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if gtmApiConnected %}
+                            <span class="tp-badge tp-badge--success">{{ 'Connected'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Not connected'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between tp-mb-md">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Consent Mode v2'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% if consentMode %}
+                            <span class="tp-badge tp-badge--success">{{ 'Enabled'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% else %}
+                            <span class="tp-badge tp-badge--neutral">{{ 'Disabled'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="tp-flex-between">
+                        <span class="tp-text-sm tp-text-muted">{{ 'Events logged'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        <span class="tp-text-sm">{{ totalEvents }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Changelog'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                </div>
+                <div class="tp-card-body">
+                    <div>
+                        <div class="tp-flex tp-gap-sm" style="align-items: center;">
+                            <span class="tp-badge tp-badge--info">v1.0.0</span>
+                            <span class="tp-text-xs tp-text-muted">{{ 'First release'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                        </div>
+                        <ul class="tp-text-sm tp-mt-sm" style="margin: 0; padding-left: 20px; color: var(--tp-text-secondary);">
+                            <li>{{ 'GTM Admin API v2 auto-configuration (tags, triggers, variables)'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                            <li>{{ 'GA4 Enhanced Ecommerce — 15 events'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                            <li>{{ 'Server-side tracking via Measurement Protocol'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                            <li>{{ 'Google Consent Mode v2'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                            <li>{{ 'Enhanced Conversions (hashed user data)'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                            <li>{{ 'Google Ads Conversion & Remarketing tags'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                            <li>{{ '3-step setup wizard (Connect → Choose → Activate)'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                            <li>{{ 'DataLayer & Order log with event inspector'|trans({}, 'Modules.Tagpilot.Admin') }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

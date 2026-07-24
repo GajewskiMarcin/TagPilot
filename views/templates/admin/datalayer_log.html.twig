@@ -1,0 +1,77 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'DataLayer Log'|trans({}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ '%count% events recorded'|trans({'%count%': total}, 'Modules.Tagpilot.Admin') }}</p>
+        </div>
+        <div class="tp-page-actions">
+            {# Event type filter #}
+            <select class="tp-select" id="tp-filter-event" style="width: auto; min-width: 160px;">
+                <option value="">{{ 'All events'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
+                {% for eventType in eventTypes %}
+                    <option value="{{ eventType }}" {{ filterEvent == eventType ? 'selected' : '' }}>{{ eventType }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="tp-card">
+        <div class="tp-card-body">
+            {% if logs|length > 0 %}
+                <div class="tp-table-wrap">
+                    <table class="tp-table">
+                        <thead>
+                            <tr>
+                                <th>{{ 'ID'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Event'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'URI'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Date'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td class="tp-font-mono">{{ log.id_event_log }}</td>
+                                <td><span class="tp-badge tp-badge--info">{{ log.event }}</span></td>
+                                <td class="tp-text-sm tp-text-muted" style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ log.uri }}</td>
+                                <td class="tp-text-sm tp-text-muted" style="white-space: nowrap;">{{ log.date_add }}</td>
+                                <td class="tp-table-actions">
+                                    <a href="{{ path('tagpilot_event_detail', {id: log.id_event_log}) }}" class="tp-btn tp-btn--ghost tp-btn--sm">{{ 'View'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Pagination #}
+                {% if totalPages > 1 %}
+                <div class="tp-pagination">
+                    <div class="tp-pagination-info">
+                        {{ 'Page %current% of %total% (%count% events)'|trans({'%current%': currentPage, '%total%': totalPages, '%count%': total}, 'Modules.Tagpilot.Admin') }}
+                    </div>
+                    <div class="tp-pagination-buttons">
+                        {% if currentPage > 1 %}
+                            <a href="{{ path('tagpilot_datalayer_log', {p: currentPage - 1, event: filterEvent}) }}" class="tp-pagination-btn">&laquo;</a>
+                        {% endif %}
+                        {% for p in max(1, currentPage - 2)..min(totalPages, currentPage + 2) %}
+                            <a href="{{ path('tagpilot_datalayer_log', {p: p, event: filterEvent}) }}" class="tp-pagination-btn {{ p == currentPage ? 'tp-pagination-btn--active' : '' }}">{{ p }}</a>
+                        {% endfor %}
+                        {% if currentPage < totalPages %}
+                            <a href="{{ path('tagpilot_datalayer_log', {p: currentPage + 1, event: filterEvent}) }}" class="tp-pagination-btn">&raquo;</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="tp-empty">
+                    <p class="tp-empty-title">{{ 'No events logged'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    <p class="tp-empty-text">{{ 'Enable event logging in Configuration to start recording.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

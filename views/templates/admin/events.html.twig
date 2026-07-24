@@ -1,0 +1,89 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'Events'|trans({}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ 'Configure which GA4 ecommerce events to track'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+        </div>
+        <div class="tp-page-actions">
+            <button class="tp-btn tp-btn--primary" id="tp-save-config">{{ 'Save'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
+        </div>
+    </div>
+
+    <div class="tp-grid tp-grid--2">
+        {# Ecommerce events #}
+        <div class="tp-card">
+            <div class="tp-card-header">
+                <h2 class="tp-card-title">{{ 'Ecommerce events'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                <span class="tp-badge tp-event-type--ecommerce">{{ 'Enhanced Ecommerce'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+            </div>
+            <div class="tp-card-body">
+                {% for key, desc in eventDescriptions %}
+                    {% if desc.type == 'ecommerce' %}
+                    <div class="tp-switch-card">
+                        <div class="tp-switch-card-info">
+                            <p class="tp-switch-card-title">{{ desc.name }}</p>
+                            <p class="tp-switch-card-desc">{{ desc.desc }}</p>
+                        </div>
+                        <label class="tp-switch">
+                            <input type="checkbox" name="{{ key }}" value="1" {{ events[key] ? 'checked' : '' }}>
+                            <span class="tp-switch-slider"></span>
+                        </label>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            {# Conversion events #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Conversion events'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                    <span class="tp-badge tp-event-type--conversion">{{ 'Server-side capable'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                </div>
+                <div class="tp-card-body">
+                    {% for key, desc in eventDescriptions %}
+                        {% if desc.type == 'conversion' %}
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">{{ desc.name }}</p>
+                                <p class="tp-switch-card-desc">{{ desc.desc }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="{{ key }}" value="1" {{ events[key] ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Engagement events #}
+            <div class="tp-card">
+                <div class="tp-card-header">
+                    <h2 class="tp-card-title">{{ 'Engagement & page events'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
+                    <span class="tp-badge tp-event-type--engagement">{{ 'Engagement'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                </div>
+                <div class="tp-card-body">
+                    {% for key, desc in eventDescriptions %}
+                        {% if desc.type == 'engagement' or desc.type == 'page' %}
+                        <div class="tp-switch-card">
+                            <div class="tp-switch-card-info">
+                                <p class="tp-switch-card-title">{{ desc.name }}</p>
+                                <p class="tp-switch-card-desc">{{ desc.desc }}</p>
+                            </div>
+                            <label class="tp-switch">
+                                <input type="checkbox" name="{{ key }}" value="1" {{ events[key] ? 'checked' : '' }}>
+                                <span class="tp-switch-slider"></span>
+                            </label>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('modules/tagpilot/views/css/tagpilot.css') }}">
+{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="/modules/tagpilot/views/css/tagpilot.css?v={{ moduleVersion|default('1.0.0') }}">
+
+    <div class="tp-wrap"
+         data-page="{{ page }}"
+         data-module-path="/modules/tagpilot/">
+
+        {% if nav is defined %}
+        <nav class="tp-topnav">
+            <div class="tp-topnav-inner">
+                {% for tab in nav %}
+                    <a href="{{ tab.url }}"
+                       class="tp-topnav-tab{% if tab.active %} tp-topnav-tab--active{% endif %}">
+                        {{ tab.label }}
+                    </a>
+                {% endfor %}
+            </div>
+        </nav>
+        {% endif %}
+
+        {% block tp_content %}{% endblock %}
+    </div>
+
+    <div class="tp-toast-container" id="tp-toasts"></div>
+    <script id="tp-translations" type="application/json">{{ jsTranslations|default({})|json_encode|raw }}</script>
+    <script src="/modules/tagpilot/views/js/tagpilot.js?v={{ moduleVersion|default('1.0.0') }}"></script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

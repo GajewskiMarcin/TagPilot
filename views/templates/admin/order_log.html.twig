@@ -1,0 +1,103 @@
+{% extends '@Modules/tagpilot/views/templates/admin/layout.html.twig' %}
+
+{% block tp_content %}
+    <div class="tp-page-header">
+        <div>
+            <h1 class="tp-page-title">{{ 'Order Log'|trans({}, 'Modules.Tagpilot.Admin') }}</h1>
+            <p class="tp-page-subtitle">{{ '%count% orders tracked'|trans({'%count%': total}, 'Modules.Tagpilot.Admin') }}</p>
+        </div>
+    </div>
+
+    <div class="tp-card">
+        <div class="tp-card-body">
+            {% if logs|length > 0 %}
+                <div class="tp-table-wrap">
+                    <table class="tp-table">
+                        <thead>
+                            <tr>
+                                <th>{{ 'Order ID'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Reference'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'GTM ID'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'DL'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'API'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Resent'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Type'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Total'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Payment'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Order date'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th>{{ 'Last update'|trans({}, 'Modules.Tagpilot.Admin') }}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td class="tp-font-mono" style="font-weight: 600;">{{ log.id_order }}</td>
+                                <td class="tp-font-mono">{{ log.order_reference }}</td>
+                                <td class="tp-text-xs tp-text-muted">{{ log.gtm_id }}</td>
+                                <td>
+                                    {% if log.dl_ok == '1' %}
+                                        <span class="tp-badge tp-badge--success">{{ 'OK'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% else %}
+                                        <span class="tp-badge tp-badge--danger">{{ 'Fail'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.sent_mp == '1' %}
+                                        <span class="tp-badge tp-badge--success">{{ 'Sent'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% else %}
+                                        <span class="tp-badge tp-badge--neutral">{{ 'No'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.resent == '1' %}
+                                        <span class="tp-badge tp-badge--warning">{{ 'Yes'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.is_refund == '1' %}
+                                        <span class="tp-badge tp-badge--warning">{{ 'Refund'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% else %}
+                                        <span class="tp-badge tp-badge--info">{{ 'Purchase'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="tp-font-mono" style="font-weight: 600; text-align: right;">{{ log.total }}</td>
+                                <td class="tp-text-sm">{{ log.payment }}</td>
+                                <td class="tp-text-sm tp-text-muted" style="white-space: nowrap;">{{ log.date_order }}</td>
+                                <td class="tp-text-sm tp-text-muted" style="white-space: nowrap;">{{ log.date_upd }}</td>
+                                <td class="tp-table-actions">
+                                    <a href="{{ path('tagpilot_order_detail', {id: log.id_order_log}) }}" class="tp-btn tp-btn--ghost tp-btn--sm">{{ 'View'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if totalPages > 1 %}
+                <div class="tp-pagination">
+                    <div class="tp-pagination-info">
+                        {{ 'Page %current% of %total% (%count% orders)'|trans({'%current%': currentPage, '%total%': totalPages, '%count%': total}, 'Modules.Tagpilot.Admin') }}
+                    </div>
+                    <div class="tp-pagination-buttons">
+                        {% if currentPage > 1 %}
+                            <a href="{{ path('tagpilot_order_log', {p: currentPage - 1}) }}" class="tp-pagination-btn">&laquo;</a>
+                        {% endif %}
+                        {% for p in max(1, currentPage - 2)..min(totalPages, currentPage + 2) %}
+                            <a href="{{ path('tagpilot_order_log', {p: p}) }}" class="tp-pagination-btn {{ p == currentPage ? 'tp-pagination-btn--active' : '' }}">{{ p }}</a>
+                        {% endfor %}
+                        {% if currentPage < totalPages %}
+                            <a href="{{ path('tagpilot_order_log', {p: currentPage + 1}) }}" class="tp-pagination-btn">&raquo;</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="tp-empty">
+                    <p class="tp-empty-title">{{ 'No orders tracked'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                    <p class="tp-empty-text">{{ 'Purchase and refund events will appear here.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

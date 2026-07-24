@@ -1,0 +1,23 @@
+services:
+    _defaults:
+        public: true
+        autowire: true
+        autoconfigure: true
+
+    Flavor\TagPilot\Controller\Admin\TagPilotController:
+        class: Flavor\TagPilot\Controller\Admin\TagPilotController
+        arguments:
+            $psRouter: '@prestashop.router'
+        tags: ['controller.service_arguments']
+
+    Flavor\TagPilot\Controller\Admin\ApiController:
+        class: Flavor\TagPilot\Controller\Admin\ApiController
+        arguments:
+            $psRouter: '@prestashop.router'
+        tags: ['controller.service_arguments']
+
+    Flavor\TagPilot\Service\GoogleOAuthService:
+        class: Flavor\TagPilot\Service\GoogleOAuthService
+
+    Flavor\TagPilot\Service\GtmApiService:
+        class: Flavor\TagPilot\Service\GtmApiService
