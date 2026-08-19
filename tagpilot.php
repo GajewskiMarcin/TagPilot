@@ -25,7 +25,7 @@ class tagpilot extends Module
     {
         $this->name = 'tagpilot';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Flavor';
         $this->need_instance = 0;
         $this->bootstrap = false;
@@ -46,6 +46,7 @@ class tagpilot extends Module
             && $this->registerHook('displayAfterBodyOpeningTag')
             && $this->registerHook('displayBeforeBodyClosingTag')
             && $this->registerHook('displayOrderConfirmation')
+            && $this->registerHook('actionValidateOrder')
             && $this->registerHook('actionOrderStatusUpdate')
             && $this->registerHook('actionCartUpdateQuantityBefore')
             && $this->registerHook('actionAuthentication')
@@ -435,13 +436,12 @@ class tagpilot extends Module
 
         $dataLayer = $this->buildPurchaseDataLayer($order);
 
-        // Save order log
+        // Save/update order log (marks dl_ok=1 for orders that also reached the confirmation page).
         $this->logOrder($order, $dataLayer);
 
-        // Server-side Measurement Protocol
-        if ((bool) self::cfg('SERVER_SIDE_PURCHASE', true)) {
-            $this->sendMeasurementProtocol($dataLayer);
-        }
+        // Server-side MP is NOT called here — it fires from hookActionValidateOrder instead,
+        // which runs on order creation regardless of whether the customer ever reaches this page
+        // (crucial for payment methods that redirect externally without returning — e.g. leasing).
 
         if ((bool) self::cfg('LOG_EVENTS', true)) {
             $this->logEvent($dataLayer);
@@ -453,6 +453,39 @@ class tagpilot extends Module
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/datalayer.tpl');
+    }
+
+    /**
+     * Fires whenever PrestaShop internally validates (creates) an order — before any redirect
+     * to external payment/leasing systems. Runs in the browser request context that submitted
+     * checkout, so $_COOKIE still carries the customer's real gtag session cookies.
+     *
+     * This is where server-side Measurement Protocol fires. Guarantees every order lands in
+     * GA4 regardless of whether the customer ever reaches /potwierdzenie-zamowienia.
+     */
+    public function hookActionValidateOrder(array $params): void
+    {
+        if (!$this->isActive() || !(bool) self::cfg('EVENT_PURCHASE', true)) {
+            return;
+        }
+        if (!(bool) self::cfg('SERVER_SIDE_PURCHASE', true)) {
+            return;
+        }
+
+        $order = $params['order'] ?? null;
+        if (!$order || !Validate::isLoadedObject($order)) {
+            return;
+        }
+
+        $dataLayer = $this->buildPurchaseDataLayer($order);
+
+        // Log order upfront with dl_ok=false — displayOrderConfirmation will flip it to 1 later
+        // if the customer actually reaches the confirmation page. dl_ok=0 on this row is a
+        // useful signal that the order was tracked server-side only (e.g. external redirect
+        // that never returned to the shop).
+        $this->logOrder($order, $dataLayer, false, false);
+
+        $this->sendMeasurementProtocol($dataLayer);
     }
 
     /**
@@ -1471,16 +1504,45 @@ class tagpilot extends Module
         return (bool) self::cfg($key, false);
     }
 
-    private function logOrder(Order $order, array $dataLayer, bool $isRefund = false): void
+    /**
+     * @param bool $dlOk true when called from a browser context (hookDisplayOrderConfirmation)
+     *                   meaning the customer actually reached the confirmation page and the
+     *                   dataLayer purchase event was pushed client-side. false when called from
+     *                   hookActionValidateOrder (server-only path — no guarantee the customer's
+     *                   browser will ever see the confirmation page).
+     */
+    private function logOrder(Order $order, array $dataLayer, bool $isRefund = false, bool $dlOk = true): void
     {
         $priceWithTax = (bool) self::cfg('PRICE_WITH_TAX', true);
         $total = $priceWithTax ? $order->total_paid_tax_incl : $order->total_paid_tax_excl;
+        $db = Db::getInstance();
+        $now = date('Y-m-d H:i:s');
 
-        Db::getInstance()->insert('tagpilot_order_log', [
+        // Upsert by id_order — actionValidateOrder + displayOrderConfirmation both call this
+        // for the same order; we don't want duplicate rows.
+        $existingId = (int) $db->getValue(
+            'SELECT id_order_log FROM `' . _DB_PREFIX_ . 'tagpilot_order_log`
+             WHERE id_order = ' . (int) $order->id . ' AND is_refund = ' . (int) $isRefund . ' LIMIT 1'
+        );
+
+        if ($existingId > 0) {
+            $update = [
+                'datalayer' => pSQL(json_encode($dataLayer, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true),
+                'date_upd' => $now,
+            ];
+            // Only ever flip dl_ok from 0 to 1 — never back.
+            if ($dlOk) {
+                $update['dl_ok'] = 1;
+            }
+            $db->update('tagpilot_order_log', $update, 'id_order_log = ' . $existingId);
+            return;
+        }
+
+        $db->insert('tagpilot_order_log', [
             'id_order' => (int) $order->id,
             'order_reference' => pSQL($order->reference),
             'gtm_id' => pSQL(self::cfg('GTM_ID', '')),
-            'dl_ok' => 1,
+            'dl_ok' => (int) $dlOk,
             'sent_mp' => (int) (bool) self::cfg('SERVER_SIDE_PURCHASE', true),
             'resent' => 0,
             'is_refund' => (int) $isRefund,
@@ -1489,8 +1551,8 @@ class tagpilot extends Module
             'status' => pSQL(''),
             'datalayer' => pSQL(json_encode($dataLayer, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true),
             'date_order' => pSQL($order->date_add),
-            'date_add' => date('Y-m-d H:i:s'),
-            'date_upd' => date('Y-m-d H:i:s'),
+            'date_add' => $now,
+            'date_upd' => $now,
         ]);
     }
 }
