@@ -25,7 +25,7 @@ class tagpilot extends Module
     {
         $this->name = 'tagpilot';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'Flavor';
         $this->need_instance = 0;
         $this->bootstrap = false;
@@ -489,7 +489,11 @@ class tagpilot extends Module
     }
 
     /**
-     * Refund tracking via order slip
+     * Refund tracking via order slip (admin creates a partial or full refund document in BO).
+     *
+     * Runs in BackOffice context — no customer cookies available. Uses the server-only refund
+     * path which reads user_data from the order and attribution from ps_connections_source
+     * instead of the browser's _ga / _ga_<STREAM> cookies.
      */
     public function hookActionObjectOrderSlipAddAfter(array $params): void
     {
@@ -507,12 +511,69 @@ class tagpilot extends Module
             return;
         }
 
+        if ($this->refundAlreadyLogged((int) $order->id)) {
+            return;
+        }
+
         $dataLayer = $this->buildRefundDataLayer($order, $orderSlip);
 
         if ((bool) self::cfg('SERVER_SIDE_REFUND', true)) {
-            $this->sendMeasurementProtocol($dataLayer);
+            $this->sendServerSideRefund($order, $dataLayer);
         }
 
+        $this->logOrder($order, $dataLayer, true);
+    }
+
+    /**
+     * Fires whenever an order's status changes. Detects transitions to a cancelled or refunded
+     * state (PS_OS_CANCELED / PS_OS_REFUND) and sends a `refund` event to GA4 so the original
+     * purchase revenue is reversed in the reports.
+     *
+     * Guards:
+     *   - only fires when the order actually has a purchase event in tagpilot_order_log (no point
+     *     "refunding" something GA4 never saw as a purchase)
+     *   - dedupes against existing refund rows in tagpilot_order_log (status can flip back and
+     *     forth in BO; we only want to send one refund per order)
+     */
+    public function hookActionOrderStatusUpdate(array $params): void
+    {
+        if (!$this->isActive() || !(bool) self::cfg('EVENT_REFUND', true)) {
+            return;
+        }
+        if (!(bool) self::cfg('SERVER_SIDE_REFUND', true)) {
+            return;
+        }
+
+        $newStatus = $params['newOrderStatus'] ?? null;
+        $orderId = (int) ($params['id_order'] ?? 0);
+        if (!$newStatus || !Validate::isLoadedObject($newStatus) || $orderId <= 0) {
+            return;
+        }
+
+        $cancelStateIds = array_filter([
+            (int) Configuration::get('PS_OS_CANCELED'),
+            (int) Configuration::get('PS_OS_REFUND'),
+        ]);
+        if (!in_array((int) $newStatus->id, $cancelStateIds, true)) {
+            return;
+        }
+
+        // Only reverse a purchase we actually reported to GA4.
+        if (!$this->purchaseWasSent($orderId)) {
+            return;
+        }
+        if ($this->refundAlreadyLogged($orderId)) {
+            return;
+        }
+
+        $order = new Order($orderId);
+        if (!Validate::isLoadedObject($order)) {
+            return;
+        }
+
+        // Full-order refund — no OrderSlip means "reverse everything".
+        $dataLayer = $this->buildRefundDataLayer($order, null);
+        $this->sendServerSideRefund($order, $dataLayer);
         $this->logOrder($order, $dataLayer, true);
     }
 
@@ -543,11 +604,6 @@ class tagpilot extends Module
     /**
      * Order status change — used for detecting refund statuses
      */
-    public function hookActionOrderStatusUpdate(array $params): void
-    {
-        // Refund detection could be extended here for status-based refunds
-    }
-
     /**
      * Cart quantity update — placeholder for future add/remove tracking
      */
@@ -811,33 +867,52 @@ class tagpilot extends Module
     /**
      * Build refund dataLayer
      */
-    private function buildRefundDataLayer(Order $order, $orderSlip): array
+    /**
+     * @param OrderSlip|null $orderSlip pass null for a full-order refund (e.g. status change to
+     *                                  cancelled) — then all order line items are included and
+     *                                  the ecommerce.value is the full order total.
+     */
+    private function buildRefundDataLayer(Order $order, $orderSlip = null): array
     {
         $idField = self::cfg('PRODUCT_ID_FIELD', 'id');
         $transactionId = $idField === 'reference' ? $order->reference : (string) $order->id;
 
         $items = [];
-        if (property_exists($orderSlip, 'product_quantity_list') && !empty($orderSlip->product_quantity_list)) {
-            // partial refund
+        $isFullRefund = ($orderSlip === null);
+
+        if ($orderSlip !== null && property_exists($orderSlip, 'product_quantity_list') && !empty($orderSlip->product_quantity_list)) {
+            // partial refund (order slip covers specific products)
+            $products = $order->getProducts();
+            foreach ($products as $product) {
+                $items[] = $this->buildItemDataFromOrderProduct($product, 0);
+            }
+        } elseif ($isFullRefund) {
+            // full-order refund — every product from the order
             $products = $order->getProducts();
             foreach ($products as $product) {
                 $items[] = $this->buildItemDataFromOrderProduct($product, 0);
             }
         }
 
-        $data = [
-            'event' => 'refund',
-            'ecommerce' => [
-                'transaction_id' => $transactionId,
-                'currency' => $this->getCurrencyCode(),
-            ],
+        $ecommerce = [
+            'transaction_id' => $transactionId,
+            'currency' => $this->getCurrencyCode(),
         ];
 
-        if (!empty($items)) {
-            $data['ecommerce']['items'] = $items;
+        // Include the reversed value only on full refunds so GA4 subtracts the whole order.
+        if ($isFullRefund) {
+            $priceWithTax = (bool) self::cfg('PRICE_WITH_TAX', true);
+            $ecommerce['value'] = round((float) ($priceWithTax ? $order->total_paid_tax_incl : $order->total_paid_tax_excl), 2);
         }
 
-        return $data;
+        if (!empty($items)) {
+            $ecommerce['items'] = $items;
+        }
+
+        return [
+            'event' => 'refund',
+            'ecommerce' => $ecommerce,
+        ];
     }
 
     /**
@@ -1554,5 +1629,248 @@ class tagpilot extends Module
             'date_add' => $now,
             'date_upd' => $now,
         ]);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    //  Server-side refund (BackOffice context — no customer cookies)
+    // ──────────────────────────────────────────────────────────────
+
+    private function refundAlreadyLogged(int $orderId): bool
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT id_order_log FROM `' . _DB_PREFIX_ . 'tagpilot_order_log`
+             WHERE id_order = ' . $orderId . ' AND is_refund = 1 LIMIT 1'
+        ) > 0;
+    }
+
+    private function purchaseWasSent(int $orderId): bool
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT id_order_log FROM `' . _DB_PREFIX_ . 'tagpilot_order_log`
+             WHERE id_order = ' . $orderId . ' AND is_refund = 0 AND sent_mp = 1 LIMIT 1'
+        ) > 0;
+    }
+
+    /**
+     * Send a refund event via GA4 Measurement Protocol from BackOffice context.
+     *
+     * Unlike sendMeasurementProtocol() which requires browser cookies (_ga / _ga_<STREAM> /
+     * flavor_cookie_consent), this method works from admin-side hooks where no customer session
+     * cookies are available. Session context and attribution are reconstructed from:
+     *   • ps_connections_source (source / medium / campaign / gclid of the original session)
+     *   • Order data (user_data hashed for Enhanced Conversions, deterministic client_id)
+     *
+     * timestamp_micros is set to "now" — GA4 MP would drop events older than 72h and the refund
+     * decision was made "now" from the admin's perspective anyway.
+     */
+    private function sendServerSideRefund(Order $order, array $dataLayer): bool
+    {
+        $measurementId = self::cfg('GA4_MEASUREMENT_ID', '');
+        $apiSecret = self::cfg('GA4_API_SECRET', '');
+        if (empty($measurementId) || empty($apiSecret)) {
+            return false;
+        }
+
+        $eventParams = $dataLayer['ecommerce'] ?? [];
+        // GA4 requires session_id + engagement_time_msec on events for proper stitching.
+        $eventParams['session_id'] = (string) time();
+        $eventParams['engagement_time_msec'] = 100;
+
+        // Attribution — read the customer's original session sources so the refund reverses in
+        // the right channel (or attach explicit campaign params if we recognize a paid click).
+        $attribution = $this->getOrderAttribution((int) $order->id);
+        foreach (['campaign_source', 'campaign_medium', 'campaign_name', 'campaign_id', 'gclid', 'gbraid'] as $k) {
+            if (!empty($attribution[$k])) {
+                $eventParams[$k] = $attribution[$k];
+            }
+        }
+
+        $payload = [
+            'client_id' => $this->deriveDeterministicClientId((int) $order->id_customer, (int) $order->id),
+            'timestamp_micros' => time() * 1_000_000,
+            'non_personalized_ads' => false,
+            'events' => [[
+                'name' => 'refund',
+                'params' => $eventParams,
+            ]],
+        ];
+        if ((int) $order->id_customer > 0) {
+            $payload['user_id'] = (string) $order->id_customer;
+        }
+
+        // Enhanced Conversions user_data — hashed per MP spec.
+        $userData = $this->buildHashedUserDataForOrder($order);
+        if (!empty($userData)) {
+            $payload['user_data'] = $userData;
+        }
+
+        $url = 'https://www.google-analytics.com/mp/collect'
+            . '?measurement_id=' . urlencode($measurementId)
+            . '&api_secret=' . urlencode($apiSecret);
+
+        return $this->postJsonToGa($url, $payload);
+    }
+
+    /**
+     * Read the customer's session sources for this order from ps_connections* and pick the best
+     * attribution signal. Priority: Google Ads click id > utm_* > referrer inference > direct.
+     */
+    private function getOrderAttribution(int $orderId): array
+    {
+        $default = ['campaign_source' => '', 'campaign_medium' => '', 'campaign_name' => '', 'campaign_id' => '', 'gclid' => '', 'gbraid' => ''];
+
+        $sources = Db::getInstance()->executeS(
+            "SELECT cs.http_referer, cs.request_uri
+             FROM `" . _DB_PREFIX_ . "orders` o
+             JOIN `" . _DB_PREFIX_ . "cart` c ON c.id_cart = o.id_cart
+             JOIN `" . _DB_PREFIX_ . "connections` conn ON conn.id_guest = c.id_guest
+             JOIN `" . _DB_PREFIX_ . "connections_source` cs ON cs.id_connections = conn.id_connections
+             WHERE o.id_order = " . $orderId . "
+             ORDER BY cs.date_add ASC"
+        );
+        if (empty($sources)) {
+            return $default;
+        }
+
+        $best = $default;
+        foreach ($sources as $s) {
+            $parsed = $this->parseAttributionFromUrl((string) ($s['request_uri'] ?? ''), (string) ($s['http_referer'] ?? ''));
+            if ($parsed['gclid'] !== '' || $parsed['gbraid'] !== '') {
+                return $parsed; // best possible signal, no need to keep looking
+            }
+            if ($best['campaign_source'] === '' && $parsed['campaign_source'] !== '') {
+                $best = $parsed;
+            }
+        }
+        return $best;
+    }
+
+    private function parseAttributionFromUrl(string $uri, string $ref): array
+    {
+        $out = ['campaign_source' => '', 'campaign_medium' => '', 'campaign_name' => '', 'campaign_id' => '', 'gclid' => '', 'gbraid' => ''];
+        $q = [];
+        if (($qs = parse_url($uri, PHP_URL_QUERY)) !== null && $qs !== false) {
+            parse_str((string) $qs, $q);
+        }
+
+        if (!empty($q['gclid'])) {
+            $out['gclid'] = (string) $q['gclid'];
+            $out['campaign_source'] = 'google';
+            $out['campaign_medium'] = 'cpc';
+        }
+        if (!empty($q['gbraid']) || !empty($q['wbraid'])) {
+            $out['gbraid'] = (string) ($q['gbraid'] ?? $q['wbraid']);
+            if ($out['campaign_source'] === '') {
+                $out['campaign_source'] = 'google';
+                $out['campaign_medium'] = 'cpc';
+            }
+        }
+        if (!empty($q['gad_campaignid'])) {
+            $out['campaign_id'] = (string) $q['gad_campaignid'];
+        }
+        if (!empty($q['gad_source']) && $out['campaign_source'] === '') {
+            $out['campaign_source'] = 'google';
+            $out['campaign_medium'] = 'cpc';
+        }
+        if (!empty($q['utm_source']))   $out['campaign_source'] = (string) $q['utm_source'];
+        if (!empty($q['utm_medium']))   $out['campaign_medium'] = (string) $q['utm_medium'];
+        if (!empty($q['utm_campaign'])) $out['campaign_name']   = (string) $q['utm_campaign'];
+        if (!empty($q['utm_id']))       $out['campaign_id']     = (string) $q['utm_id'];
+
+        if ($out['campaign_source'] === '' && $ref !== '') {
+            $host = strtolower(preg_replace('/^www\./', '', (string) parse_url($ref, PHP_URL_HOST)));
+            if (preg_match('/^(google\.|bing\.|duckduckgo\.|yahoo\.)/', $host)) {
+                $out['campaign_source'] = preg_replace('/\..*/', '', $host);
+                $out['campaign_medium'] = 'organic';
+            } elseif (preg_match('/(facebook\.|instagram\.|twitter\.|x\.com|linkedin\.|tiktok\.)/', $host)) {
+                $out['campaign_source'] = preg_replace('/\..*/', '', $host);
+                $out['campaign_medium'] = 'social';
+            } elseif ($host !== '') {
+                $out['campaign_source'] = $host;
+                $out['campaign_medium'] = 'referral';
+            }
+        }
+        return $out;
+    }
+
+    private function buildHashedUserDataForOrder(Order $order): array
+    {
+        $out = [];
+        $customer = new Customer((int) $order->id_customer);
+        if (Validate::isLoadedObject($customer) && !empty($customer->email)) {
+            $out['sha256_email_address'] = [hash('sha256', strtolower(trim((string) $customer->email)))];
+        }
+        $addressId = (int) ($order->id_address_invoice ?: $order->id_address_delivery);
+        if ($addressId > 0) {
+            $address = new Address($addressId);
+            if (Validate::isLoadedObject($address)) {
+                $phone = $this->normalizePhone($address->phone_mobile ?? $address->phone, (int) $address->id_country);
+                if ($phone !== '') {
+                    $out['sha256_phone_number'] = [hash('sha256', $phone)];
+                }
+                $addr = array_filter([
+                    'sha256_first_name' => !empty($address->firstname) ? hash('sha256', strtolower(trim($address->firstname))) : null,
+                    'sha256_last_name' => !empty($address->lastname) ? hash('sha256', strtolower(trim($address->lastname))) : null,
+                    'postal_code' => (string) $address->postcode,
+                    'country' => strtoupper((string) Country::getIsoById((int) $address->id_country)),
+                ], fn($v) => $v !== null && $v !== '');
+                if (!empty($addr)) {
+                    $out['address'] = [$addr];
+                }
+            }
+        }
+        return $out;
+    }
+
+    private function deriveDeterministicClientId(int $customerId, int $orderId): string
+    {
+        if ($customerId > 0) {
+            return hexdec(substr(md5('tp.' . $customerId), 0, 8)) . '.' . strtotime('2020-01-01');
+        }
+        return $orderId . '.' . strtotime('2020-01-01');
+    }
+
+    /**
+     * POST a JSON payload to a Google endpoint. Uses curl when available, else stream wrappers
+     * so the module works on installs where the curl extension is absent from PHP.
+     */
+    private function postJsonToGa(string $url, array $payload): bool
+    {
+        $body = json_encode($payload, JSON_UNESCAPED_SLASHES);
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 5,
+                CURLOPT_CONNECTTIMEOUT => 3,
+            ]);
+            curl_exec($ch);
+            $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            return $code >= 200 && $code < 300;
+        }
+        $ctx = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\nContent-Length: " . strlen($body) . "\r\n",
+                'content' => $body,
+                'timeout' => 5,
+                'ignore_errors' => true,
+            ],
+        ]);
+        @file_get_contents($url, false, $ctx);
+        $code = 0;
+        if (!empty($http_response_header)) {
+            foreach ($http_response_header as $h) {
+                if (preg_match('#^HTTP/\S+\s+(\d+)#', $h, $m)) {
+                    $code = (int) $m[1];
+                    break;
+                }
+            }
+        }
+        return $code >= 200 && $code < 300;
     }
 }
