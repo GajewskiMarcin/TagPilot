@@ -1,6 +1,7 @@
 /vendor/*
 !/vendor/autoload.php
 !/vendor/index.php
+!/vendor/.htaccess
 /tools/
 /node_modules/
 /cache/
