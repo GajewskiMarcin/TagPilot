@@ -47,6 +47,24 @@
             }).then(function (r) { return r.json(); });
         },
 
+        // ── Badge helper ─────────────────────────────────────────
+        // Returns a detached <span class="tp-badge tp-badge--<kind>"> with text set via
+        // textContent. Used instead of building badge markup as a string, because some of
+        // these messages carry text from the GA4 API response.
+        badge: function (text, kind) {
+            var el = document.createElement('span');
+            el.className = 'tp-badge tp-badge--' + kind;
+            el.textContent = text;
+            return el;
+        },
+
+        // Replace an element's contents with a single node, without parsing HTML.
+        setContent: function (el, node) {
+            if (!el) return;
+            el.textContent = '';
+            el.appendChild(node);
+        },
+
         // ── Toast notifications ──────────────────────────────────
         toast: function (message, type) {
             var container = document.getElementById('tp-toasts');
@@ -54,8 +72,21 @@
 
             var toast = document.createElement('div');
             toast.className = 'tp-toast tp-toast--' + (type || 'success');
-            toast.innerHTML = '<span class="tp-toast-message">' + message + '</span>' +
-                '<button class="tp-toast-close" onclick="this.parentElement.remove()">&times;</button>';
+
+            // Built as nodes rather than innerHTML: `message` is not always trusted. Callers
+            // pass GA4 Measurement Protocol validation text and API error strings straight
+            // through, so an error message containing markup used to be parsed as HTML here.
+            var text = document.createElement('span');
+            text.className = 'tp-toast-message';
+            text.textContent = message;
+
+            var close = document.createElement('button');
+            close.className = 'tp-toast-close';
+            close.textContent = '\u00D7';
+            close.addEventListener('click', function () { toast.remove(); });
+
+            toast.appendChild(text);
+            toast.appendChild(close);
             container.appendChild(toast);
 
             setTimeout(function () { toast.remove(); }, 5000);
@@ -125,19 +156,19 @@
                 self.ajax(self.getApiUrl('test-connection'), 'POST')
                     .then(function (result) {
                         if (result.success) {
-                            if (resultEl) resultEl.innerHTML = '<span class="tp-badge tp-badge--success">' + self.tr('validationOk', 'Validation OK — no errors') + '</span>';
+                            self.setContent(resultEl, self.badge(self.tr('validationOk', 'Validation OK — no errors'), 'success'));
                             self.toast(self.tr('mpConnectionSuccess', 'GA4 Measurement Protocol connection successful'), 'success');
                         } else {
                             var msg = result.error || self.tr('validationErrors', 'Validation errors');
                             if (result.validationMessages && result.validationMessages.length) {
                                 msg = result.validationMessages.map(function(m) { return m.description; }).join(', ');
                             }
-                            if (resultEl) resultEl.innerHTML = '<span class="tp-badge tp-badge--danger">' + self.tr('failed', 'Failed') + ': ' + msg + '</span>';
+                            self.setContent(resultEl, self.badge(self.tr('failed', 'Failed') + ': ' + msg, 'danger'));
                             self.toast(self.tr('connectionFailed', 'Connection failed') + ': ' + msg, 'error');
                         }
                     })
                     .catch(function () {
-                        if (resultEl) resultEl.innerHTML = '<span class="tp-badge tp-badge--danger">' + self.tr('networkError', 'Network error') + '</span>';
+                        self.setContent(resultEl, self.badge(self.tr('networkError', 'Network error'), 'danger'));
                     })
                     .finally(function () {
                         btn.disabled = false;
