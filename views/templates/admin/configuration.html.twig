@@ -71,8 +71,19 @@
 
                     <div class="tp-form-group">
                         <label class="tp-label">{{ 'API Secret'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
-                        <input type="password" class="tp-input" name="GA4_API_SECRET" value="{{ config.GA4_API_SECRET }}" placeholder="{{ 'Enter your API secret'|trans({}, 'Modules.Tagpilot.Admin') }}" style="max-width: 400px;">
-                        <p class="tp-help-text">{{ 'GA4 Admin > Data Streams > Measurement Protocol API secrets'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                        {# Write-only: the stored secret is deliberately never rendered back into
+                           the page. Submitting this field empty keeps the current value. #}
+                        <input type="password" class="tp-input" name="GA4_API_SECRET" value="" autocomplete="off"
+                               placeholder="{% if hasApiSecret %}{{ 'Saved — leave empty to keep it'|trans({}, 'Modules.Tagpilot.Admin') }}{% else %}{{ 'Enter your API secret'|trans({}, 'Modules.Tagpilot.Admin') }}{% endif %}"
+                               style="max-width: 400px;">
+                        <p class="tp-help-text">
+                            {{ 'GA4 Admin > Data Streams > Measurement Protocol API secrets'|trans({}, 'Modules.Tagpilot.Admin') }}
+                            {% if hasApiSecret %}
+                                <span class="tp-badge tp-badge--success">{{ 'Configured'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                            {% else %}
+                                <span class="tp-badge tp-badge--neutral">{{ 'Not set'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                            {% endif %}
+                        </p>
                     </div>
 
                     <div class="tp-flex tp-gap-sm tp-mt-md">

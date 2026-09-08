@@ -138,11 +138,17 @@ class TagPilotController extends BaseController
             $config[$key] = $this->cfg($key, '');
         }
 
+        // Write-only values: never rendered back into the page, only reported as set/unset.
+        // See ApiController::WRITE_ONLY_KEYS -- saving an empty value there keeps the stored one.
+        $hasApiSecret = $config['GA4_API_SECRET'] !== '';
+        unset($config['GA4_API_SECRET']);
+
         return $this->render('@Modules/tagpilot/views/templates/admin/configuration.html.twig', array_merge($this->getHeaderVars(), [
             'nav' => $this->nav('config'),
             'page' => 'configuration',
             'moduleVersion' => $this->getModule()->version,
             'config' => $config,
+            'hasApiSecret' => $hasApiSecret,
         ]));
     }
 

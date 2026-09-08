@@ -21,6 +21,18 @@ class ApiController extends BaseController
     private const PREFIX = 'TAGPILOT_';
 
     /**
+     * Credentials that are never rendered back into the admin page.
+     *
+     * The configuration form therefore always posts them empty, so an empty submitted value
+     * means "keep what is stored" rather than "clear it". Without this, every save from the
+     * configuration screen would wipe the secret.
+     */
+    private const WRITE_ONLY_KEYS = [
+        'GA4_API_SECRET',
+        'GOOGLE_CLIENT_SECRET',
+    ];
+
+    /**
      * Save configuration
      */
     public function saveConfig(Request $request): JsonResponse
@@ -50,9 +62,16 @@ class ApiController extends BaseController
         ];
 
         foreach ($data as $key => $value) {
-            if (in_array($key, $allowedKeys, true)) {
-                Configuration::updateValue(self::PREFIX . $key, $value);
+            if (!in_array($key, $allowedKeys, true)) {
+                continue;
             }
+
+            // Write-only credentials are posted empty by design; don't clobber the stored value.
+            if (in_array($key, self::WRITE_ONLY_KEYS, true) && trim((string) $value) === '') {
+                continue;
+            }
+
+            Configuration::updateValue(self::PREFIX . $key, $value);
         }
 
         return new JsonResponse(['success' => true]);
