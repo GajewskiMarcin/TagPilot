@@ -308,24 +308,27 @@ class ApiController extends BaseController
 
     public function oauthCallback(Request $request): Response
     {
-        $code = $request->query->get('code', '');
-        $state = $request->query->get('state', '');
-        $error = $request->query->get('error', '');
+        $code = (string) $request->query->get('code', '');
+        $state = (string) $request->query->get('state', '');
+        $error = (string) $request->query->get('error', '');
 
         $router = $this->psRouter;
         $wizardUrl = $router->generate('tagpilot_wizard');
 
-        if ($error) {
+        // Consume the stored state up front so it is single-use whatever happens next --
+        // previously the error branch below returned while leaving it valid for a replay.
+        $savedState = (string) Configuration::get(self::PREFIX . 'OAUTH_STATE');
+        Configuration::deleteByName(self::PREFIX . 'OAUTH_STATE');
+
+        if ($error !== '') {
             return new RedirectResponse($wizardUrl . '?oauth_error=' . urlencode($error));
         }
 
-        // Verify state
-        $savedState = (string) Configuration::get(self::PREFIX . 'OAUTH_STATE');
-        if (empty($state) || $state !== $savedState) {
+        // Verify state. The empty checks are not redundant: hash_equals('', '') is true, so
+        // without them a callback with no state would pass when none was stored.
+        if ($state === '' || $savedState === '' || !hash_equals($savedState, $state)) {
             return new RedirectResponse($wizardUrl . '?oauth_error=invalid_state');
         }
-
-        Configuration::deleteByName(self::PREFIX . 'OAUTH_STATE');
 
         $oauth = new GoogleOAuthService();
         $redirectUri = $request->getSchemeAndHttpHost() . $router->generate('tagpilot_oauth_callback');
