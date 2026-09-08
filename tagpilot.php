@@ -367,14 +367,75 @@ class tagpilot extends Module
             return '';
         }
 
-        // Consent Mode v2 defaults are owned by ConsentFlow (hookDisplayHeader
-        // with higher priority). TagPilot only bootstraps GTM here.
+        $consent = $this->getConsentDefaults();
+
         $this->context->smarty->assign([
             'tp_gtm_id' => $gtmId,
             'tp_debug' => (bool) self::cfg('DEBUG_MODE', false),
+            // Encoded here rather than looped in the template: the same inline-script flags the
+            // dataLayer uses, and no chance of emitting a malformed object literal.
+            'tp_consent_json' => $consent === null
+                ? ''
+                : json_encode($consent, self::JSON_INLINE_SCRIPT_FLAGS),
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/head.tpl');
+    }
+
+    /**
+     * CMP modules that emit their own Consent Mode defaults.
+     *
+     * When one of these is installed and enabled it owns the default state, and TagPilot must
+     * stay out of the way: two gtag('consent', 'default', ...) calls in the same page is a
+     * misconfiguration, and the CMP is the component that actually knows the visitor's choice.
+     */
+    const CMP_MODULES = ['consentflow'];
+
+    /**
+     * Build the Consent Mode v2 default state, or null when TagPilot must not emit one.
+     *
+     * Returns null if the feature is switched off, or if a CMP module is present and owns the
+     * defaults. Otherwise every consent type is listed explicitly: an omitted type is treated as
+     * granted by gtag, so leaving one out would be the opposite of a safe default.
+     *
+     * The module exposes two settings, so the mapping is:
+     *   analytics_storage                                    <- CONSENT_DEFAULT_ANALYTICS
+     *   ad_storage, ad_user_data, ad_personalization,
+     *   personalization_storage                              <- CONSENT_DEFAULT_ADS
+     *   functionality_storage, security_storage               always granted
+     *
+     * ad_user_data and ad_personalization are what makes this v2 rather than v1 -- they are
+     * required since March 2024 for Google Ads features in the EEA. personalization_storage is
+     * tied to the ads setting deliberately: it is the more conservative of the two, so it stays
+     * denied by default.
+     *
+     * @return array<string, string>|null
+     */
+    private function getConsentDefaults(): ?array
+    {
+        if (!(bool) self::cfg('CONSENT_MODE', true)) {
+            return null;
+        }
+
+        foreach (self::CMP_MODULES as $cmp) {
+            if (Module::isInstalled($cmp) && Module::isEnabled($cmp)) {
+                return null;
+            }
+        }
+
+        // Anything other than an explicit 'granted' is treated as denied.
+        $analytics = self::cfg('CONSENT_DEFAULT_ANALYTICS', 'denied') === 'granted' ? 'granted' : 'denied';
+        $ads = self::cfg('CONSENT_DEFAULT_ADS', 'denied') === 'granted' ? 'granted' : 'denied';
+
+        return [
+            'analytics_storage' => $analytics,
+            'ad_storage' => $ads,
+            'ad_user_data' => $ads,
+            'ad_personalization' => $ads,
+            'personalization_storage' => $ads,
+            'functionality_storage' => 'granted',
+            'security_storage' => 'granted',
+        ];
     }
 
     /**
