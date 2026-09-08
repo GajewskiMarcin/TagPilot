@@ -157,6 +157,23 @@ class BaseController extends FrameworkBundleAdminController
             'credentialsSaved' => $this->trans('Credentials saved! Reloading...', 'Modules.Tagpilot.Admin'),
             'couldNotStartOAuth' => $this->trans('Could not start OAuth', 'Modules.Tagpilot.Admin'),
             'disconnected' => $this->trans('Disconnected', 'Modules.Tagpilot.Admin'),
+            'confirmDisconnectFull' => $this->trans(
+                'Disconnect the Google account?'
+                . "\n\n"
+                . 'This will revoke TagPilot\'s access at Google and delete the OAuth client ID, '
+                . 'client secret and both tokens from this shop. Nothing about your GTM container '
+                . 'or GA4 property changes.'
+                . "\n\n"
+                . 'Tracking keeps working: the GTM container ID, GA4 Measurement ID and API secret '
+                . 'are kept. You only need to reconnect if you want to run the GTM auto-configurator again.',
+                'Modules.Tagpilot.Admin'
+            ),
+            'disconnectedRevoked' => $this->trans('Disconnected. Access revoked at Google and all credentials deleted.', 'Modules.Tagpilot.Admin'),
+            'disconnectedNotRevoked' => $this->trans(
+                'Credentials deleted from this shop, but Google could not be reached to revoke access. '
+                . 'Please remove it manually at myaccount.google.com/permissions',
+                'Modules.Tagpilot.Admin'
+            ),
             'errorLoadingContainers' => $this->trans('Error loading containers', 'Modules.Tagpilot.Admin'),
             'selectAccountContainer' => $this->trans('Please select an account, container, and enter GA4 Measurement ID', 'Modules.Tagpilot.Admin'),
             'gtmConfigured' => $this->trans('GTM auto-configured! Click "Publish" to go live.', 'Modules.Tagpilot.Admin'),

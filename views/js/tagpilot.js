@@ -361,13 +361,32 @@
             var disconnectBtn = document.getElementById('tp-disconnect-google');
             if (disconnectBtn) {
                 disconnectBtn.addEventListener('click', function () {
-                    if (!confirm(self.tr('confirmDisconnect', 'Disconnect Google account? You can reconnect later.'))) return;
+                    var warning = self.tr('confirmDisconnectFull',
+                        'Disconnect the Google account?\n\n'
+                        + 'This will revoke TagPilot\'s access at Google and delete the OAuth client ID, '
+                        + 'client secret and both tokens from this shop. Nothing about your GTM container '
+                        + 'or GA4 property changes.\n\n'
+                        + 'Tracking keeps working: the GTM container ID, GA4 Measurement ID and API secret '
+                        + 'are kept. You only need to reconnect if you want to run the GTM auto-configurator again.');
+
+                    if (!confirm(warning)) return;
+
                     self.ajax(self.getApiUrl('gtm/disconnect'), 'POST')
                         .then(function (result) {
-                            if (result.success) {
-                                self.toast(self.tr('disconnected', 'Disconnected'), 'success');
-                                setTimeout(function () { window.location.reload(); }, 1000);
+                            if (!result.success) return;
+
+                            // The local wipe always happens; the revoke can fail if Google is
+                            // unreachable. Say which one it was instead of a blanket success.
+                            if (result.revoked || !result.hadToken) {
+                                self.toast(self.tr('disconnectedRevoked',
+                                    'Disconnected. Access revoked at Google and all credentials deleted.'), 'success');
+                            } else {
+                                self.toast(self.tr('disconnectedNotRevoked',
+                                    'Credentials deleted from this shop, but Google could not be reached to revoke '
+                                    + 'access. Please remove it manually at myaccount.google.com/permissions'), 'error');
                             }
+
+                            setTimeout(function () { window.location.reload(); }, 2500);
                         });
                 });
             }

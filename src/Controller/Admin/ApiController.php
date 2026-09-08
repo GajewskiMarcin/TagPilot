@@ -512,9 +512,16 @@ class ApiController extends BaseController
         }
 
         $oauth = new GoogleOAuthService();
-        $oauth->disconnect();
+        $result = $oauth->disconnect();
 
-        return new JsonResponse(['success' => true]);
+        // `revoked` false with hadToken true means the local credentials are gone but the grant
+        // may still be live on the Google account; the UI tells the user to finish by hand.
+        return new JsonResponse([
+            'success' => true,
+            'revoked' => $result['revoked'],
+            'hadToken' => $result['hadToken'],
+            'cleared' => count($result['cleared']),
+        ]);
     }
 
     public function gtmStatus(): JsonResponse

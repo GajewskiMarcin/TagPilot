@@ -15,6 +15,35 @@ class GoogleOAuthService
     private const PREFIX = 'TAGPILOT_';
     private const TOKEN_URL = 'https://oauth2.googleapis.com/token';
     private const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+    private const REVOKE_URL = 'https://oauth2.googleapis.com/revoke';
+
+    /**
+     * Everything disconnect() removes: the OAuth credentials, the tokens, and the state that
+     * only the Tag Manager API integration uses.
+     *
+     * GTM_ID, GA4_MEASUREMENT_ID, GA4_API_SECRET and ENABLED are deliberately NOT in this list.
+     * Storefront tracking depends only on those (tagpilot::isActive() is ENABLED && GTM_ID, and
+     * Measurement Protocol needs just the measurement id and the API secret), so disconnecting
+     * must not stop the shop from tracking.
+     */
+    private const DISCONNECT_KEYS = [
+        // Credentials and tokens
+        'GOOGLE_CLIENT_ID',
+        'GOOGLE_CLIENT_SECRET',
+        'GOOGLE_ACCESS_TOKEN',
+        'GOOGLE_REFRESH_TOKEN',
+        'GOOGLE_TOKEN_EXPIRES',
+        // Transient OAuth handshake state
+        'OAUTH_STATE',
+        'OAUTH_RETURN_URL',
+        // Tag Manager API bookkeeping
+        'GTM_ACCOUNT_ID',
+        'GTM_CONTAINER_ID',
+        'GTM_CONTAINER_NAME',
+        'GTM_CONFIGURED',
+        'GTM_WORKSPACE_PATH',
+        'GTM_LAST_PUBLISH',
+    ];
     private const SCOPES = [
         'https://www.googleapis.com/auth/tagmanager.readonly',
         'https://www.googleapis.com/auth/tagmanager.edit.containers',
@@ -119,15 +148,88 @@ class GoogleOAuthService
         return '';
     }
 
-    public function disconnect(): void
+    /**
+     * Revoke the grant at Google, then delete every local credential.
+     *
+     * Previously this only deleted the three token rows: the shop forgot the tokens, but the
+     * authorisation stayed live on the Google account, and GOOGLE_CLIENT_ID /
+     * GOOGLE_CLIENT_SECRET were left behind. Since the scopes include tagmanager.publish --
+     * which is the ability to publish arbitrary JavaScript to the storefront -- a refresh token
+     * that is never revoked is worth removing properly.
+     *
+     * The local wipe runs whether or not the revoke call succeeds. If Google is unreachable the
+     * right outcome is still to forget the credentials locally; the return value says whether
+     * the remote grant is actually gone so the caller can tell the user to finish the job by
+     * hand at https://myaccount.google.com/permissions.
+     *
+     * @return array{revoked: bool, hadToken: bool, cleared: string[]}
+     */
+    public function disconnect(): array
     {
-        Configuration::deleteByName(self::PREFIX . 'GOOGLE_ACCESS_TOKEN');
-        Configuration::deleteByName(self::PREFIX . 'GOOGLE_REFRESH_TOKEN');
-        Configuration::deleteByName(self::PREFIX . 'GOOGLE_TOKEN_EXPIRES');
-        Configuration::deleteByName(self::PREFIX . 'GTM_ACCOUNT_ID');
-        Configuration::deleteByName(self::PREFIX . 'GTM_CONTAINER_ID');
-        Configuration::deleteByName(self::PREFIX . 'GTM_CONTAINER_NAME');
-        Configuration::deleteByName(self::PREFIX . 'GTM_CONFIGURED');
+        // Revoking the refresh token invalidates the whole grant, access tokens included, so it
+        // is the one to send when present.
+        $refreshToken = (string) Configuration::get(self::PREFIX . 'GOOGLE_REFRESH_TOKEN');
+        $accessToken = (string) Configuration::get(self::PREFIX . 'GOOGLE_ACCESS_TOKEN');
+        $token = $refreshToken !== '' ? $refreshToken : $accessToken;
+
+        $revoked = false;
+        if ($token !== '') {
+            $revoked = $this->revokeToken($token);
+        }
+
+        $cleared = [];
+        foreach (self::DISCONNECT_KEYS as $key) {
+            if (Configuration::get(self::PREFIX . $key) !== false) {
+                $cleared[] = $key;
+            }
+            Configuration::deleteByName(self::PREFIX . $key);
+        }
+
+        return [
+            'revoked' => $revoked,
+            'hadToken' => $token !== '',
+            'cleared' => $cleared,
+        ];
+    }
+
+    /**
+     * POST the token to Google's revocation endpoint.
+     *
+     * Returns true only when the grant is genuinely gone:
+     *   - 200                        the token was revoked
+     *   - 400 with "invalid_token"   Google does not recognise it, so there is nothing left to
+     *                                revoke -- same end state as far as the shop is concerned
+     *
+     * Everything else is false: a network failure, a 5xx, or a 400 for any other reason. Being
+     * strict matters here, because this boolean is what tells the merchant whether they still
+     * need to revoke by hand at myaccount.google.com/permissions. Reporting success on a
+     * malformed-request 400 would be a quietly false reassurance.
+     */
+    private function revokeToken(string $token): bool
+    {
+        $ch = curl_init(self::REVOKE_URL);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query(['token' => $token]),
+            CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 15,
+        ]);
+
+        $body = curl_exec($ch);
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($status === 200) {
+            return true;
+        }
+
+        if ($status === 400) {
+            $decoded = json_decode((string) $body, true);
+            return ($decoded['error'] ?? '') === 'invalid_token';
+        }
+
+        return false;
     }
 
     private function storeTokens(array $response): void
