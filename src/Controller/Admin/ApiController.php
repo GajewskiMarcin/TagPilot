@@ -292,10 +292,19 @@ class ApiController extends BaseController
         );
         $deleted = $before - $remaining;
 
+        // The order log is never truncated -- refundAlreadyLogged() and purchaseWasSent() read
+        // those rows to avoid re-sending events -- so its personal data is redacted in place
+        // instead. 'Purge all' redacts regardless of age; otherwise the retention window applies.
+        $module = Module::getInstanceByName('tagpilot');
+        $redacted = $purgeAll
+            ? $module->redactOrderLogPii()
+            : $module->redactOrderLogPii($days);
+
         return new JsonResponse([
             'success' => true,
             'deleted' => $deleted,
             'remaining' => $remaining,
+            'redacted' => $redacted,
             'days' => $days,
         ]);
     }

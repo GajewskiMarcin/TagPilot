@@ -69,6 +69,10 @@ class TagPilotController extends BaseController
     {
         $this->denyUnlessGranted('read');
 
+        // PrestaShop gives modules no cron, so PII retention is driven from here: at most once
+        // every 24h, and only from an admin page so a customer's page load never pays for it.
+        $this->getModule()->applyPiiRetentionDaily();
+
         $db = Db::getInstance();
 
         // Stats
