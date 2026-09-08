@@ -77,7 +77,13 @@ class BaseController extends FrameworkBundleAdminController
             'layoutHeaderToolbarBtn' => $this->getToolbarButtons(),
             'enableSidebar' => false,
             'help_link' => '',
-            'jsTranslations' => $this->getJsTranslations(),
+            // Pre-encoded here rather than with Twig's |json_encode, which applies no flags:
+            // this block is inlined in the page, so it needs the same JSON_HEX_TAG treatment as
+            // the storefront dataLayer or a translation containing "</script>" would break out.
+            'jsTranslationsJson' => json_encode(
+                $this->getJsTranslations(),
+                \tagpilot::JSON_INLINE_SCRIPT_FLAGS
+            ),
         ];
     }
 

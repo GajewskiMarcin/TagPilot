@@ -29,7 +29,8 @@
     </div>
 
     <div class="tp-toast-container" id="tp-toasts"></div>
-    <script id="tp-translations" type="application/json">{{ jsTranslations|default({})|json_encode|raw }}</script>
+    {# Already JSON, encoded in BaseController with JSON_HEX_TAG et al. -- see getHeaderVars(). #}
+    <script id="tp-translations" type="application/json">{{ jsTranslationsJson|default('{}')|raw }}</script>
     <script src="/modules/tagpilot/views/js/tagpilot.js?v={{ moduleVersion|default('1.0.0') }}"></script>
 {% endblock %}
 
