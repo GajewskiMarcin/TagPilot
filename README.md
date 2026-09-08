@@ -46,6 +46,16 @@ Built for PrestaShop 8.0 – 9.x. Zero coding required for standard installation
 3. Install from **Modules → Module Manager**
 4. Open **TagPilot** in the admin sidebar
 
+### GTM container: import instead of OAuth
+
+The module can auto-configure your GTM container over the Tag Manager API, which needs a
+Google OAuth connection. If you would rather not grant that access — or your GTM account is
+managed by someone else — `gtm/tagpilot-container.json` is a container export that creates the
+same setup by hand: 18 variables, 15 triggers and 16 tags, with no shop-specific data.
+
+Import it with **Merge → Rename conflicting**, never Overwrite, then set your Measurement ID in
+the one constant variable. Full instructions in [`gtm/README.md`](gtm/README.md).
+
 ### From PrestaShop Marketplace
 
 Not yet — the module currently lives here on GitHub only.
