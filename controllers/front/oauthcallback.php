@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use Flavor\TagPilot\Service\GoogleOAuthService;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class TagpilotOauthcallbackModuleFrontController extends ModuleFrontController
 {
     public function initContent(): void

@@ -16,6 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class ApiController extends BaseController
 {
     private const PREFIX = 'TAGPILOT_';

@@ -7,6 +7,10 @@ namespace Flavor\TagPilot\Controller\Admin;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\Routing\RouterInterface;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class BaseController extends FrameworkBundleAdminController
 {
     /** @var RouterInterface */

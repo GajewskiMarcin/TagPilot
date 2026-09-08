@@ -6,6 +6,10 @@ namespace Flavor\TagPilot\Service;
 
 use Configuration;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class GoogleOAuthService
 {
     private const PREFIX = 'TAGPILOT_';
