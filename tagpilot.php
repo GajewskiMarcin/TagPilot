@@ -21,6 +21,24 @@ class tagpilot extends Module
 {
     const PREFIX = 'TAGPILOT_';
 
+    /**
+     * json_encode() flags for JSON embedded inline in a <script> block.
+     *
+     * JSON_HEX_TAG is the one that matters for security: it turns < and > into \u003C / \u003E
+     * so a value containing "</script>" cannot close the tag and inject markup. HEX_AMP /
+     * HEX_APOS / HEX_QUOT are belt-and-braces for other HTML contexts. Note that
+     * JSON_UNESCAPED_SLASHES must NOT be used here -- keeping "\/" escaped is a second line of
+     * defence against "</script>".
+     *
+     * Values reaching the dataLayer are attacker-controlled: search terms come straight from the
+     * query string, and product / category names come from the catalogue.
+     */
+    const JSON_INLINE_SCRIPT_FLAGS = JSON_UNESCAPED_UNICODE
+        | JSON_HEX_TAG
+        | JSON_HEX_AMP
+        | JSON_HEX_APOS
+        | JSON_HEX_QUOT;
+
     public function __construct()
     {
         $this->name = 'tagpilot';
@@ -397,7 +415,7 @@ class tagpilot extends Module
         }
 
         $this->context->smarty->assign([
-            'tp_datalayer_json' => json_encode($dataLayer, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'tp_datalayer_json' => json_encode($dataLayer, self::JSON_INLINE_SCRIPT_FLAGS),
             'tp_debug' => (bool) self::cfg('DEBUG_MODE', false),
         ]);
 
@@ -448,7 +466,7 @@ class tagpilot extends Module
         }
 
         $this->context->smarty->assign([
-            'tp_datalayer_json' => json_encode([$dataLayer], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'tp_datalayer_json' => json_encode([$dataLayer], self::JSON_INLINE_SCRIPT_FLAGS),
             'tp_debug' => (bool) self::cfg('DEBUG_MODE', false),
         ]);
 
