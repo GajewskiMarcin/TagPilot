@@ -37,10 +37,36 @@ class ApiController extends BaseController
     ];
 
     /**
+     * Abort with a 403 JSON body unless the current employee holds $permission.
+     *
+     * The page controllers throw AccessDeniedException and let PrestaShop render its permission
+     * screen; these endpoints are consumed by fetch() in views/js/tagpilot.js, which expects
+     * JSON, so they return it instead of throwing.
+     *
+     * @return JsonResponse|null null when access is granted, so callers read as
+     *                           `if ($denied = $this->denyApiUnlessGranted('update')) { ... }`
+     */
+    private function denyApiUnlessGranted(string $permission): ?JsonResponse
+    {
+        if ($this->hasTagPilotPermission($permission)) {
+            return null;
+        }
+
+        return new JsonResponse([
+            'success' => false,
+            'error' => 'You do not have permission to perform this action.',
+        ], 403);
+    }
+
+    /**
      * Save configuration
      */
     public function saveConfig(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true);
         if (empty($data)) {
             return new JsonResponse(['success' => false, 'error' => 'Invalid data'], 400);
@@ -86,6 +112,10 @@ class ApiController extends BaseController
      */
     public function testConnection(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $measurementId = Configuration::get(self::PREFIX . 'GA4_MEASUREMENT_ID');
         $apiSecret = Configuration::get(self::PREFIX . 'GA4_API_SECRET');
 
@@ -150,6 +180,10 @@ class ApiController extends BaseController
      */
     public function resendOrder(int $id, Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $db = Db::getInstance();
         $log = $db->getRow(
             'SELECT * FROM `' . _DB_PREFIX_ . 'tagpilot_order_log` WHERE id_order_log = ' . (int) $id
@@ -227,6 +261,10 @@ class ApiController extends BaseController
      */
     public function purgeLogs(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('delete')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true) ?: [];
         $purgeAll = !empty($data['all']);
 
@@ -268,6 +306,10 @@ class ApiController extends BaseController
 
     public function saveOAuthCredentials(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true);
         $clientId = trim($data['client_id'] ?? '');
         $clientSecret = trim($data['client_secret'] ?? '');
@@ -284,6 +326,10 @@ class ApiController extends BaseController
 
     public function oauthStart(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
 
         if (!$oauth->isConfigured()) {
@@ -308,6 +354,10 @@ class ApiController extends BaseController
 
     public function oauthCallback(Request $request): Response
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $code = (string) $request->query->get('code', '');
         $state = (string) $request->query->get('state', '');
         $error = (string) $request->query->get('error', '');
@@ -344,6 +394,10 @@ class ApiController extends BaseController
 
     public function gtmAccounts(): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('read')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
         $gtm = new GtmApiService($oauth);
 
@@ -358,6 +412,10 @@ class ApiController extends BaseController
 
     public function gtmContainers(string $accountId): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('read')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
         $gtm = new GtmApiService($oauth);
 
@@ -372,6 +430,10 @@ class ApiController extends BaseController
 
     public function gtmConfigure(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true);
         $accountId = $data['account_id'] ?? '';
         $containerId = $data['container_id'] ?? '';
@@ -422,6 +484,10 @@ class ApiController extends BaseController
 
     public function gtmPublish(): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
         $gtm = new GtmApiService($oauth);
 
@@ -432,6 +498,10 @@ class ApiController extends BaseController
 
     public function gtmDisconnect(): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
         $oauth->disconnect();
 
@@ -440,6 +510,10 @@ class ApiController extends BaseController
 
     public function gtmStatus(): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('read')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
 
         return new JsonResponse([
