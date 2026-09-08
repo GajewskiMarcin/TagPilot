@@ -98,8 +98,10 @@
             var data = {};
             var wrap = document.querySelector('.tp-wrap');
 
-            // Collect all inputs from entire page
-            wrap.querySelectorAll('input[name], select[name]').forEach(function (el) {
+            // Collect all inputs from entire page. Disabled controls are skipped: they are the
+            // settings the module stores but never reads, shown greyed out, and there is no
+            // point rewriting their values on every save.
+            wrap.querySelectorAll('input[name]:not([disabled]), select[name]:not([disabled])').forEach(function (el) {
                 if (el.type === 'checkbox') {
                     data[el.name] = el.checked ? '1' : '0';
                 } else {

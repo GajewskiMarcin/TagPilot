@@ -36,13 +36,16 @@
                         <p class="tp-help-text">{{ 'Your Google Tag Manager container ID (e.g. GTM-ABC123)'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
                     </div>
 
-                    <div class="tp-switch-card tp-mt-sm">
+                    <div class="tp-switch-card tp-mt-sm tp-setting--inactive">
                         <div class="tp-switch-card-info">
-                            <p class="tp-switch-card-title">{{ 'Load GTM script'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
-                            <p class="tp-switch-card-desc">{{ 'Inject the GTM JavaScript snippet. Disable if loaded by another module.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-title">
+                                {{ 'Load GTM script'|trans({}, 'Modules.Tagpilot.Admin') }}
+                                <span class="tp-badge tp-badge--neutral">{{ 'No effect'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                            </p>
+                            <p class="tp-switch-card-desc">{{ 'Not wired up yet — this setting is saved but the module does not read it.'|trans({}, 'Modules.Tagpilot.Admin') }} {{ 'The snippet is injected whenever the module is enabled and a container ID is set.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
                         </div>
                         <label class="tp-switch">
-                            <input type="checkbox" name="LOAD_GTM_SCRIPT" value="1" {{ config.LOAD_GTM_SCRIPT == '1' ? 'checked' : '' }}>
+                            <input type="checkbox" name="LOAD_GTM_SCRIPT" value="1" disabled {{ config.LOAD_GTM_SCRIPT == '1' ? 'checked' : '' }}>
                             <span class="tp-switch-slider"></span>
                         </label>
                     </div>
@@ -125,28 +128,38 @@
                     <h2 class="tp-card-title">{{ 'Consent Mode v2'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
                 </div>
                 <div class="tp-card-body">
-                    <div class="tp-switch-card tp-mb-md">
+                    <div class="tp-alert tp-alert--warning tp-mb-md">
+                        <span>
+                            <strong>{{ 'TagPilot does not emit consent defaults.'|trans({}, 'Modules.Tagpilot.Admin') }}</strong>
+                            {{ 'The three settings below are stored but never read, so they are shown disabled. Emitting gtag(\'consent\', \'default\', ...) before GTM loads is the job of a CMP — without one, consent falls back to granted, which is not GDPR-compliant in the EU.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                        </span>
+                    </div>
+
+                    <div class="tp-switch-card tp-mb-md tp-setting--inactive">
                         <div class="tp-switch-card-info">
-                            <p class="tp-switch-card-title">{{ 'Enable Consent Mode'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
-                            <p class="tp-switch-card-desc">{{ 'Set default consent state. Your CMP should update consent via gtag().'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-switch-card-title">
+                                {{ 'Enable Consent Mode'|trans({}, 'Modules.Tagpilot.Admin') }}
+                                <span class="tp-badge tp-badge--neutral">{{ 'No effect'|trans({}, 'Modules.Tagpilot.Admin') }}</span>
+                            </p>
+                            <p class="tp-switch-card-desc">{{ 'Not wired up yet — this setting is saved but the module does not read it.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
                         </div>
                         <label class="tp-switch">
-                            <input type="checkbox" name="CONSENT_MODE" value="1" {{ config.CONSENT_MODE == '1' ? 'checked' : '' }}>
+                            <input type="checkbox" name="CONSENT_MODE" value="1" disabled {{ config.CONSENT_MODE == '1' ? 'checked' : '' }}>
                             <span class="tp-switch-slider"></span>
                         </label>
                     </div>
 
-                    <div class="tp-grid tp-grid--2">
+                    <div class="tp-grid tp-grid--2 tp-setting--inactive">
                         <div class="tp-form-group">
                             <label class="tp-label">{{ 'Default analytics_storage'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
-                            <select class="tp-select" name="CONSENT_DEFAULT_ANALYTICS">
+                            <select class="tp-select" name="CONSENT_DEFAULT_ANALYTICS" disabled>
                                 <option value="denied" {{ config.CONSENT_DEFAULT_ANALYTICS == 'denied' ? 'selected' : '' }}>{{ 'denied'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
                                 <option value="granted" {{ config.CONSENT_DEFAULT_ANALYTICS == 'granted' ? 'selected' : '' }}>{{ 'granted'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
                             </select>
                         </div>
                         <div class="tp-form-group">
                             <label class="tp-label">{{ 'Default ad_storage'|trans({}, 'Modules.Tagpilot.Admin') }}</label>
-                            <select class="tp-select" name="CONSENT_DEFAULT_ADS">
+                            <select class="tp-select" name="CONSENT_DEFAULT_ADS" disabled>
                                 <option value="denied" {{ config.CONSENT_DEFAULT_ADS == 'denied' ? 'selected' : '' }}>{{ 'denied'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
                                 <option value="granted" {{ config.CONSENT_DEFAULT_ADS == 'granted' ? 'selected' : '' }}>{{ 'granted'|trans({}, 'Modules.Tagpilot.Admin') }}</option>
                             </select>
