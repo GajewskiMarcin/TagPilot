@@ -30,14 +30,21 @@ Built for PrestaShop 8.0 – 9.x. Zero coding required for standard installation
 
 ## Installation
 
-### From this repository
+### From the release zip (recommended)
 
-1. Download the latest release zip (or `git clone` this repo)
-2. Rename the folder to `tagpilot` if needed
-3. Upload to `<your-shop>/modules/tagpilot/`
-4. Run `composer install --no-dev` inside `modules/tagpilot/` (installs Google API client used by the auto-configurator)
-5. In PrestaShop Back Office: **Modules → Module Catalog → Upload a module** (if uploading zip) OR just install from **Modules → Module Manager** if you copied files directly
-6. Open **TagPilot** in the admin sidebar
+1. Download the `tagpilot-vX.Y.Z.zip` asset from the [latest release](https://github.com/GajewskiMarcin/TagPilot/releases) — it is ready to install, no Composer step needed
+2. In PrestaShop Back Office: **Modules → Module Catalog → Upload a module**
+3. Open **TagPilot** in the admin sidebar
+
+> Do **not** use GitHub's auto-generated "Source code (zip)" link: it is a plain
+> snapshot of the repository and the back office will reject the folder name.
+
+### From a git clone
+
+1. `git clone` this repo into `<your-shop>/modules/tagpilot/` (the folder **must** be named `tagpilot`)
+2. Optional: run `composer install --no-dev --optimize-autoloader` inside `modules/tagpilot/` for Composer's optimized classmap. The module ships a dependency-free fallback autoloader at `vendor/autoload.php`, so it also runs fine without this step
+3. Install from **Modules → Module Manager**
+4. Open **TagPilot** in the admin sidebar
 
 ### From PrestaShop Marketplace
 

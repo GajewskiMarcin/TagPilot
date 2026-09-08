@@ -1,4 +1,6 @@
-/vendor/
+/vendor/*
+!/vendor/autoload.php
+!/vendor/index.php
 /tools/
 /node_modules/
 /cache/
