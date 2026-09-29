@@ -13,6 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class TagPilotController extends BaseController
 {
     private const PREFIX = 'TAGPILOT_';
@@ -63,6 +67,12 @@ class TagPilotController extends BaseController
 
     public function dashboard(): Response
     {
+        $this->denyUnlessGranted('read');
+
+        // PrestaShop gives modules no cron, so PII retention is driven from here: at most once
+        // every 24h, and only from an admin page so a customer's page load never pays for it.
+        $this->getModule()->applyPiiRetentionDaily();
+
         $db = Db::getInstance();
 
         // Stats
@@ -120,6 +130,8 @@ class TagPilotController extends BaseController
 
     public function configuration(Request $request): Response
     {
+        $this->denyUnlessGranted('read');
+
         $configKeys = [
             'ENABLED', 'GTM_ID', 'GA4_MEASUREMENT_ID', 'GA4_API_SECRET',
             'LOAD_GTM_SCRIPT', 'CONSENT_MODE', 'CONSENT_DEFAULT_ANALYTICS',
@@ -138,11 +150,17 @@ class TagPilotController extends BaseController
             $config[$key] = $this->cfg($key, '');
         }
 
+        // Write-only values: never rendered back into the page, only reported as set/unset.
+        // See ApiController::WRITE_ONLY_KEYS -- saving an empty value there keeps the stored one.
+        $hasApiSecret = $config['GA4_API_SECRET'] !== '';
+        unset($config['GA4_API_SECRET']);
+
         return $this->render('@Modules/tagpilot/views/templates/admin/configuration.html.twig', array_merge($this->getHeaderVars(), [
             'nav' => $this->nav('config'),
             'page' => 'configuration',
             'moduleVersion' => $this->getModule()->version,
             'config' => $config,
+            'hasApiSecret' => $hasApiSecret,
         ]));
     }
 
@@ -152,6 +170,8 @@ class TagPilotController extends BaseController
 
     public function events(): Response
     {
+        $this->denyUnlessGranted('read');
+
         $eventKeys = [
             'EVENT_PAGE_VIEW', 'EVENT_VIEW_ITEM', 'EVENT_VIEW_ITEM_LIST',
             'EVENT_SELECT_ITEM', 'EVENT_ADD_TO_CART', 'EVENT_REMOVE_FROM_CART',
@@ -198,6 +218,8 @@ class TagPilotController extends BaseController
 
     public function datalayerLog(Request $request): Response
     {
+        $this->denyUnlessGranted('read');
+
         $db = Db::getInstance();
         $page = max(1, (int) $request->query->get('p', 1));
         $filterEvent = $request->query->get('event', '');
@@ -240,6 +262,8 @@ class TagPilotController extends BaseController
 
     public function eventDetail(int $id): Response
     {
+        $this->denyUnlessGranted('read');
+
         $db = Db::getInstance();
         $log = $db->getRow(
             'SELECT * FROM `' . _DB_PREFIX_ . 'tagpilot_event_log` WHERE id_event_log = ' . (int) $id
@@ -264,6 +288,8 @@ class TagPilotController extends BaseController
 
     public function orderLog(Request $request): Response
     {
+        $this->denyUnlessGranted('read');
+
         $db = Db::getInstance();
         $page = max(1, (int) $request->query->get('p', 1));
 
@@ -292,6 +318,8 @@ class TagPilotController extends BaseController
 
     public function orderDetail(int $id): Response
     {
+        $this->denyUnlessGranted('read');
+
         $db = Db::getInstance();
         $log = $db->getRow(
             'SELECT * FROM `' . _DB_PREFIX_ . 'tagpilot_order_log` WHERE id_order_log = ' . (int) $id
@@ -320,6 +348,8 @@ class TagPilotController extends BaseController
 
     public function wizard(): Response
     {
+        $this->denyUnlessGranted('read');
+
         $oauth = new GoogleOAuthService();
         $gtm = new GtmApiService($oauth);
 
@@ -371,6 +401,8 @@ class TagPilotController extends BaseController
 
     public function debug(): Response
     {
+        $this->denyUnlessGranted('read');
+
         $db = Db::getInstance();
 
         $recentEvents = $db->executeS(
@@ -411,6 +443,8 @@ class TagPilotController extends BaseController
 
     public function support(): Response
     {
+        $this->denyUnlessGranted('read');
+
         $db = Db::getInstance();
         $oauth = new GoogleOAuthService();
 

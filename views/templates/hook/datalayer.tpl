@@ -6,6 +6,11 @@
     {* Clear ecommerce before pushing new data *}
     window.dataLayer.push({ldelim} ecommerce: null {rdelim});
 
+    {* nofilter is required: the value is already a complete JSON document, so Smarty's HTML
+       escaping would corrupt it. It is safe because tagpilot.php encodes it with
+       JSON_INLINE_SCRIPT_FLAGS (JSON_HEX_TAG et al.), which escapes < and > and therefore makes
+       it impossible for a value to close this <script> tag. Do not add JSON_UNESCAPED_SLASHES
+       to that encode, and do not assign this variable from anywhere that skips those flags. *}
     var events = {$tp_datalayer_json nofilter};
 
     if (Array.isArray(events)) {ldelim}

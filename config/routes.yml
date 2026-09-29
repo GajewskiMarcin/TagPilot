@@ -131,6 +131,8 @@ tagpilot_api_gtm_containers:
         _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmContainers'
         _legacy_controller: AdminTagPilot
         _legacy_link: AdminTagPilot
+    requirements:
+        accountId: \d+
 
 tagpilot_api_gtm_configure:
     path: /tagpilot/api/gtm/configure

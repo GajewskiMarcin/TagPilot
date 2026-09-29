@@ -6,9 +6,21 @@ namespace Flavor\TagPilot\Controller\Admin;
 
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class BaseController extends FrameworkBundleAdminController
 {
+    /**
+     * The tab / legacy controller these routes hang off, as declared by _legacy_controller in
+     * config/routes.yml and created by tagpilot::installTabs(). PageVoter joins it with the
+     * permission to build the ROLE_MOD_TAB_ADMINTAGPILOT_<PERM> role it looks up.
+     */
+    protected const LEGACY_CONTROLLER = 'AdminTagPilot';
+
     /** @var RouterInterface */
     protected $psRouter;
 
@@ -27,6 +39,50 @@ class BaseController extends FrameworkBundleAdminController
     protected function getContext()
     {
         return \Context::getContext();
+    }
+
+    /**
+     * Whether the current employee holds $permission ('read', 'create', 'update' or 'delete')
+     * on this module's tab.
+     *
+     * Checked in code rather than with the AdminSecurity annotation/attribute on purpose: the
+     * module declares compatibility with PrestaShop 8.0 through 9.x, and there is no single
+     * declarative form that enforces across that whole range. PS 8 only ships
+     * Security\Annotation\AdminSecurity; PS 9 added Security\Attribute\AdminSecurity and
+     * deprecated the annotation. The attribute is silently ignored on PS 8 -- it would look
+     * protected while enforcing nothing -- and the annotation logs a deprecation on PS 9 and is
+     * slated for removal. PageVoter, which is what both forms ultimately consult, has an
+     * identical contract in both versions, so calling it directly is the portable option.
+     */
+    protected function hasTagPilotPermission(string $permission): bool
+    {
+        $employee = $this->getContext()->employee ?? null;
+
+        // Super admins always pass. Tab::initAccess() does grant profile 1 all four permissions
+        // unconditionally at install time, so this is belt-and-braces rather than the primary
+        // path -- but installTabs() updates a pre-existing AdminTagPilot tab with save(), which
+        // does not run initAccess(), and locking the shop owner out of their own module would be
+        // a worse bug than the one this fixes.
+        if ($employee && (int) $employee->id_profile === (int) _PS_ADMIN_PROFILE_) {
+            return true;
+        }
+
+        return $this->isGranted($permission, static::LEGACY_CONTROLLER);
+    }
+
+    /**
+     * Abort with 403 unless the current employee holds $permission. For page controllers --
+     * PrestaShop turns AccessDeniedException into its standard "no permission" screen.
+     */
+    protected function denyUnlessGranted(string $permission): void
+    {
+        if (!$this->hasTagPilotPermission($permission)) {
+            throw new AccessDeniedException(sprintf(
+                'Employee lacks the "%s" permission on %s.',
+                $permission,
+                static::LEGACY_CONTROLLER
+            ));
+        }
     }
 
     protected function generateSidebarLink($section, $title = false)
@@ -73,7 +129,13 @@ class BaseController extends FrameworkBundleAdminController
             'layoutHeaderToolbarBtn' => $this->getToolbarButtons(),
             'enableSidebar' => false,
             'help_link' => '',
-            'jsTranslations' => $this->getJsTranslations(),
+            // Pre-encoded here rather than with Twig's |json_encode, which applies no flags:
+            // this block is inlined in the page, so it needs the same JSON_HEX_TAG treatment as
+            // the storefront dataLayer or a translation containing "</script>" would break out.
+            'jsTranslationsJson' => json_encode(
+                $this->getJsTranslations(),
+                \tagpilot::JSON_INLINE_SCRIPT_FLAGS
+            ),
         ];
     }
 
@@ -95,6 +157,23 @@ class BaseController extends FrameworkBundleAdminController
             'credentialsSaved' => $this->trans('Credentials saved! Reloading...', 'Modules.Tagpilot.Admin'),
             'couldNotStartOAuth' => $this->trans('Could not start OAuth', 'Modules.Tagpilot.Admin'),
             'disconnected' => $this->trans('Disconnected', 'Modules.Tagpilot.Admin'),
+            'confirmDisconnectFull' => $this->trans(
+                'Disconnect the Google account?'
+                . "\n\n"
+                . 'This will revoke TagPilot\'s access at Google and delete the OAuth client ID, '
+                . 'client secret and both tokens from this shop. Nothing about your GTM container '
+                . 'or GA4 property changes.'
+                . "\n\n"
+                . 'Tracking keeps working: the GTM container ID, GA4 Measurement ID and API secret '
+                . 'are kept. You only need to reconnect if you want to run the GTM auto-configurator again.',
+                'Modules.Tagpilot.Admin'
+            ),
+            'disconnectedRevoked' => $this->trans('Disconnected. Access revoked at Google and all credentials deleted.', 'Modules.Tagpilot.Admin'),
+            'disconnectedNotRevoked' => $this->trans(
+                'Credentials deleted from this shop, but Google could not be reached to revoke access. '
+                . 'Please remove it manually at myaccount.google.com/permissions',
+                'Modules.Tagpilot.Admin'
+            ),
             'errorLoadingContainers' => $this->trans('Error loading containers', 'Modules.Tagpilot.Admin'),
             'selectAccountContainer' => $this->trans('Please select an account, container, and enter GA4 Measurement ID', 'Modules.Tagpilot.Admin'),
             'gtmConfigured' => $this->trans('GTM auto-configured! Click "Publish" to go live.', 'Modules.Tagpilot.Admin'),

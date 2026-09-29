@@ -1,0 +1,25 @@
+# TagPilot — block direct HTTP access to files that are only ever read from disk by PHP.
+#
+# The per-directory index.php guards stop directory listings, but they do not stop a request
+# for a known filename. Without this, config/routes.yml, config/services.yml, composer.json
+# and every .twig / .tpl template were downloadable in plaintext, handing an attacker the
+# module's full endpoint map and internal structure.
+#
+# Matching is by extension rather than by path so that the real web assets under views/css/
+# and views/js/ keep being served normally.
+#
+# NOTE: Apache only. Nginx ignores .htaccess — on nginx add the equivalent to the server
+# block, e.g.:
+#   location ~* /modules/tagpilot/.*\.(yml|yaml|json|lock|twig|tpl|md|xml|sql|sh|dist|log)$ {
+#       deny all;
+#   }
+
+<FilesMatch "\.(yml|yaml|json|lock|twig|tpl|md|xml|sql|sh|dist|log|neon|editorconfig)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>

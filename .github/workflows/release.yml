@@ -1,0 +1,82 @@
+name: Build module package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+          coverage: none
+
+      # Generates vendor/autoload.php (plus vendor/composer/InstalledVersions.php),
+      # replacing the dependency-free fallback autoloader committed to the repo.
+      - name: Install dependencies and build autoloader
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Read module version
+        id: version
+        run: |
+          version=$(sed -n 's:.*<version><!\[CDATA\[\(.*\)\]\]></version>.*:\1:p' config.xml | head -n1)
+          if [ -z "$version" ]; then
+            echo "Could not read <version> from config.xml" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # PrestaShop's module installer requires a single top-level folder
+      # matching the module name.
+      - name: Stage module folder
+        run: |
+          mkdir -p build/tagpilot
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='.editorconfig' \
+            --exclude='build' \
+            --exclude='tools' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='*.log' \
+            ./ build/tagpilot/
+
+      - name: Create zip
+        run: |
+          cd build
+          zip -rq "../tagpilot-v${{ steps.version.outputs.version }}.zip" tagpilot
+
+      - name: Verify package
+        run: |
+          zip="tagpilot-v${{ steps.version.outputs.version }}.zip"
+          # Fail loudly rather than shipping another package without an autoloader.
+          unzip -l "$zip" | grep -q 'tagpilot/vendor/autoload.php' \
+            || { echo "vendor/autoload.php missing from $zip" >&2; exit 1; }
+          unzip -l "$zip" | grep -q 'tagpilot/tagpilot.php' \
+            || { echo "tagpilot.php missing from $zip" >&2; exit 1; }
+          unzip -l "$zip"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tagpilot-v${{ steps.version.outputs.version }}
+          path: tagpilot-v${{ steps.version.outputs.version }}.zip
+
+      - name: Attach zip to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tagpilot-v${{ steps.version.outputs.version }}.zip

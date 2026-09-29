@@ -65,6 +65,9 @@
                         <div class="tp-connection-info">
                             <h3 class="tp-connection-title">{{ 'Google account connected'|trans({}, 'Modules.Tagpilot.Admin') }}</h3>
                             <p class="tp-connection-detail">{{ 'OAuth2 authentication is active. You can manage your GTM containers.'|trans({}, 'Modules.Tagpilot.Admin') }}</p>
+                            <p class="tp-help-text">
+                                {{ 'The stored credentials are only needed to run the auto-configurator. Once your container is set up you can disconnect: that revokes access at Google and deletes the client ID, client secret and tokens from this shop. Tracking is unaffected.'|trans({}, 'Modules.Tagpilot.Admin') }}
+                            </p>
                         </div>
                         <button class="tp-btn tp-btn--ghost tp-btn--sm" id="tp-disconnect-google">{{ 'Disconnect'|trans({}, 'Modules.Tagpilot.Admin') }}</button>
                     </div>

@@ -1,0 +1,15 @@
+# TagPilot — nothing in this directory is meant to be requested over HTTP.
+# Its contents are loaded from disk by PHP (autoloader, Symfony config, templates, SQL,
+# translations), so deny everything. Web assets live in views/css/ and views/js/, which are
+# deliberately not covered by this rule.
+#
+# NOTE: Apache only. Nginx ignores .htaccess — see the module root .htaccess for the
+# equivalent nginx directive.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>

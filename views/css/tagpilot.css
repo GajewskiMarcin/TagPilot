@@ -519,6 +519,25 @@
 .tp-alert--danger { background: var(--tp-danger-bg); color: var(--tp-danger-text); }
 
 /* --------------------------------------------------------------------------
+   Inactive settings
+
+   Controls whose configuration value is stored but never read by the module.
+   Dimmed and disabled rather than removed, so an existing stored value is not
+   silently discarded and the layout the merchant knows stays put.
+   -------------------------------------------------------------------------- */
+.tp-setting--inactive {
+    opacity: 0.55;
+}
+.tp-setting--inactive input,
+.tp-setting--inactive select,
+.tp-setting--inactive .tp-switch {
+    cursor: not-allowed;
+}
+.tp-setting--inactive .tp-switch-card-title::after {
+    content: none;
+}
+
+/* --------------------------------------------------------------------------
    Connection status
    -------------------------------------------------------------------------- */
 .tp-connection {

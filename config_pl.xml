@@ -2,7 +2,7 @@
 <module>
     <name>tagpilot</name>
     <displayName><![CDATA[TagPilot &ndash; GTM & GA4 Ecommerce]]></displayName>
-    <version><![CDATA[1.0.2]]></version>
+    <version><![CDATA[1.0.3]]></version>
     <description><![CDATA[Pelna integracja Google Tag Manager z GA4 Enhanced Ecommerce, Measurement Protocol API i Consent Mode v2.]]></description>
     <author><![CDATA[Flavor]]></author>
     <tab><![CDATA[analytics_stats]]></tab>

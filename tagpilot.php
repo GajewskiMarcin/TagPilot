@@ -21,11 +21,29 @@ class tagpilot extends Module
 {
     const PREFIX = 'TAGPILOT_';
 
+    /**
+     * json_encode() flags for JSON embedded inline in a <script> block.
+     *
+     * JSON_HEX_TAG is the one that matters for security: it turns < and > into \u003C / \u003E
+     * so a value containing "</script>" cannot close the tag and inject markup. HEX_AMP /
+     * HEX_APOS / HEX_QUOT are belt-and-braces for other HTML contexts. Note that
+     * JSON_UNESCAPED_SLASHES must NOT be used here -- keeping "\/" escaped is a second line of
+     * defence against "</script>".
+     *
+     * Values reaching the dataLayer are attacker-controlled: search terms come straight from the
+     * query string, and product / category names come from the catalogue.
+     */
+    const JSON_INLINE_SCRIPT_FLAGS = JSON_UNESCAPED_UNICODE
+        | JSON_HEX_TAG
+        | JSON_HEX_AMP
+        | JSON_HEX_APOS
+        | JSON_HEX_QUOT;
+
     public function __construct()
     {
         $this->name = 'tagpilot';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->author = 'Flavor';
         $this->need_instance = 0;
         $this->bootstrap = false;
@@ -53,6 +71,8 @@ class tagpilot extends Module
             && $this->registerHook('actionCustomerAccountAdd')
             && $this->registerHook('actionObjectOrderSlipAddAfter')
             && $this->registerHook('actionFrontControllerSetMedia')
+            && $this->registerHook('actionDeleteGDPRCustomer')
+            && $this->registerHook('actionExportGDPRData')
             && $this->setDefaultConfig();
     }
 
@@ -347,14 +367,75 @@ class tagpilot extends Module
             return '';
         }
 
-        // Consent Mode v2 defaults are owned by ConsentFlow (hookDisplayHeader
-        // with higher priority). TagPilot only bootstraps GTM here.
+        $consent = $this->getConsentDefaults();
+
         $this->context->smarty->assign([
             'tp_gtm_id' => $gtmId,
             'tp_debug' => (bool) self::cfg('DEBUG_MODE', false),
+            // Encoded here rather than looped in the template: the same inline-script flags the
+            // dataLayer uses, and no chance of emitting a malformed object literal.
+            'tp_consent_json' => $consent === null
+                ? ''
+                : json_encode($consent, self::JSON_INLINE_SCRIPT_FLAGS),
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/head.tpl');
+    }
+
+    /**
+     * CMP modules that emit their own Consent Mode defaults.
+     *
+     * When one of these is installed and enabled it owns the default state, and TagPilot must
+     * stay out of the way: two gtag('consent', 'default', ...) calls in the same page is a
+     * misconfiguration, and the CMP is the component that actually knows the visitor's choice.
+     */
+    const CMP_MODULES = ['consentflow'];
+
+    /**
+     * Build the Consent Mode v2 default state, or null when TagPilot must not emit one.
+     *
+     * Returns null if the feature is switched off, or if a CMP module is present and owns the
+     * defaults. Otherwise every consent type is listed explicitly: an omitted type is treated as
+     * granted by gtag, so leaving one out would be the opposite of a safe default.
+     *
+     * The module exposes two settings, so the mapping is:
+     *   analytics_storage                                    <- CONSENT_DEFAULT_ANALYTICS
+     *   ad_storage, ad_user_data, ad_personalization,
+     *   personalization_storage                              <- CONSENT_DEFAULT_ADS
+     *   functionality_storage, security_storage               always granted
+     *
+     * ad_user_data and ad_personalization are what makes this v2 rather than v1 -- they are
+     * required since March 2024 for Google Ads features in the EEA. personalization_storage is
+     * tied to the ads setting deliberately: it is the more conservative of the two, so it stays
+     * denied by default.
+     *
+     * @return array<string, string>|null
+     */
+    private function getConsentDefaults(): ?array
+    {
+        if (!(bool) self::cfg('CONSENT_MODE', true)) {
+            return null;
+        }
+
+        foreach (self::CMP_MODULES as $cmp) {
+            if (Module::isInstalled($cmp) && Module::isEnabled($cmp)) {
+                return null;
+            }
+        }
+
+        // Anything other than an explicit 'granted' is treated as denied.
+        $analytics = self::cfg('CONSENT_DEFAULT_ANALYTICS', 'denied') === 'granted' ? 'granted' : 'denied';
+        $ads = self::cfg('CONSENT_DEFAULT_ADS', 'denied') === 'granted' ? 'granted' : 'denied';
+
+        return [
+            'analytics_storage' => $analytics,
+            'ad_storage' => $ads,
+            'ad_user_data' => $ads,
+            'ad_personalization' => $ads,
+            'personalization_storage' => $ads,
+            'functionality_storage' => 'granted',
+            'security_storage' => 'granted',
+        ];
     }
 
     /**
@@ -397,7 +478,7 @@ class tagpilot extends Module
         }
 
         $this->context->smarty->assign([
-            'tp_datalayer_json' => json_encode($dataLayer, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'tp_datalayer_json' => json_encode($dataLayer, self::JSON_INLINE_SCRIPT_FLAGS),
             'tp_debug' => (bool) self::cfg('DEBUG_MODE', false),
         ]);
 
@@ -448,7 +529,7 @@ class tagpilot extends Module
         }
 
         $this->context->smarty->assign([
-            'tp_datalayer_json' => json_encode([$dataLayer], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'tp_datalayer_json' => json_encode([$dataLayer], self::JSON_INLINE_SCRIPT_FLAGS),
             'tp_debug' => (bool) self::cfg('DEBUG_MODE', false),
         ]);
 
@@ -1629,6 +1710,232 @@ class tagpilot extends Module
             'date_add' => $now,
             'date_upd' => $now,
         ]);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    //  PII retention & GDPR
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * dataLayer keys holding personal data.
+     *
+     * `user_data` carries the Enhanced Conversions payload — email, phone in E.164, first and
+     * last name, postal code, country. `user_id` is the PrestaShop customer id, which is
+     * pseudonymous but still personal data because it is trivially re-identifiable against the
+     * shop's own tables.
+     */
+    const PII_DATALAYER_KEYS = ['user_data', 'user_id'];
+
+    /**
+     * Recursively strip PII_DATALAYER_KEYS out of a decoded dataLayer structure.
+     */
+    private static function stripPii(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (in_array($key, self::PII_DATALAYER_KEYS, true)) {
+                unset($data[$key]);
+                continue;
+            }
+            if (is_array($value)) {
+                $data[$key] = self::stripPii($value);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Redact the personal data from stored order log rows, keeping the rows themselves.
+     *
+     * Deliberately a redaction and not a DELETE. refundAlreadyLogged() and purchaseWasSent()
+     * both decide whether to fire a server-side event by looking for an existing row, so
+     * removing old rows would make the module re-send refunds it had already sent. The row and
+     * every non-personal field (totals, status, dl_ok, sent_mp) survive; only the PII inside
+     * `datalayer` goes.
+     *
+     * @param int|null $olderThanDays redact rows older than this many days; null for any age
+     * @param int|null $customerId    restrict to one customer's orders (GDPR erasure)
+     *
+     * @return int number of rows rewritten
+     */
+    public function redactOrderLogPii(?int $olderThanDays = null, ?int $customerId = null): int
+    {
+        $db = Db::getInstance();
+        $table = _DB_PREFIX_ . 'tagpilot_order_log';
+
+        $where = ["datalayer LIKE '%user_data%' OR datalayer LIKE '%user_id%'"];
+
+        if ($olderThanDays !== null) {
+            $where[] = 'date_add < DATE_SUB(NOW(), INTERVAL ' . (int) $olderThanDays . ' DAY)';
+        }
+
+        if ($customerId !== null) {
+            $where[] = 'id_order IN (SELECT id_order FROM `' . _DB_PREFIX_ . 'orders`
+                        WHERE id_customer = ' . (int) $customerId . ')';
+        }
+
+        $rows = $db->executeS(
+            'SELECT id_order_log, datalayer FROM `' . $table . '`
+             WHERE (' . implode(') AND (', $where) . ')'
+        ) ?: [];
+
+        $redacted = 0;
+        foreach ($rows as $row) {
+            $decoded = json_decode((string) $row['datalayer'], true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+
+            $clean = self::stripPii($decoded);
+            if ($clean === $decoded) {
+                continue;
+            }
+
+            $db->update(
+                'tagpilot_order_log',
+                ['datalayer' => pSQL(json_encode($clean, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true)],
+                'id_order_log = ' . (int) $row['id_order_log']
+            );
+            ++$redacted;
+        }
+
+        return $redacted;
+    }
+
+    /**
+     * Redact PII from stored event log rows.
+     *
+     * tagpilot_event_log has no customer column — the storefront dataLayer is logged as-is — so
+     * an erasure request has to match on the email inside the JSON. Rows are redacted rather
+     * than deleted for consistency with the order log; the event log is also subject to the
+     * LOG_RETENTION_DAYS purge, which removes them outright.
+     *
+     * @param string|null $email match only rows containing this address; null for every row
+     *
+     * @return int number of rows rewritten
+     */
+    public function redactEventLogPii(?string $email = null, ?int $olderThanDays = null): int
+    {
+        $db = Db::getInstance();
+        $table = _DB_PREFIX_ . 'tagpilot_event_log';
+
+        $where = ["datalayer LIKE '%user_data%' OR datalayer LIKE '%user_id%'"];
+
+        if ($email !== null && $email !== '') {
+            $where[] = "datalayer LIKE '%" . pSQL($email) . "%'";
+        }
+
+        if ($olderThanDays !== null) {
+            $where[] = 'date_add < DATE_SUB(NOW(), INTERVAL ' . (int) $olderThanDays . ' DAY)';
+        }
+
+        $rows = $db->executeS(
+            'SELECT id_event_log, datalayer FROM `' . $table . '`
+             WHERE (' . implode(') AND (', $where) . ')'
+        ) ?: [];
+
+        $redacted = 0;
+        foreach ($rows as $row) {
+            $decoded = json_decode((string) $row['datalayer'], true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+
+            $clean = self::stripPii($decoded);
+            if ($clean === $decoded) {
+                continue;
+            }
+
+            $db->update(
+                'tagpilot_event_log',
+                ['datalayer' => pSQL(json_encode($clean, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true)],
+                'id_event_log = ' . (int) $row['id_event_log']
+            );
+            ++$redacted;
+        }
+
+        return $redacted;
+    }
+
+    /**
+     * Apply LOG_RETENTION_DAYS to the personal data in both log tables.
+     *
+     * @return int total rows rewritten
+     */
+    public function applyPiiRetention(): int
+    {
+        $days = (int) self::cfg('LOG_RETENTION_DAYS', 30);
+        if ($days <= 0) {
+            $days = 30;
+        }
+
+        return $this->redactOrderLogPii($days) + $this->redactEventLogPii(null, $days);
+    }
+
+    /**
+     * Run applyPiiRetention() at most once every 24h.
+     *
+     * PrestaShop gives modules no cron, so this is driven from the module's own admin pages
+     * (see TagPilotController::dashboard). Keeping it out of the storefront hooks is
+     * intentional: retention housekeeping must not add queries to a customer's page load.
+     */
+    public function applyPiiRetentionDaily(): void
+    {
+        $last = (int) self::cfg('PII_SWEEP_LAST', 0);
+        if ($last > 0 && (time() - $last) < 86400) {
+            return;
+        }
+
+        Configuration::updateValue(self::PREFIX . 'PII_SWEEP_LAST', (string) time());
+        $this->applyPiiRetention();
+    }
+
+    /**
+     * GDPR erasure request, dispatched by the official psgdpr module.
+     *
+     * @param array $customer ['id' => int, 'email' => string]
+     *
+     * @return string json_encode(true) on success, as psgdpr expects
+     */
+    public function hookActionDeleteGDPRCustomer($customer)
+    {
+        $customerId = (int) ($customer['id'] ?? 0);
+        $email = (string) ($customer['email'] ?? '');
+
+        if ($customerId > 0) {
+            $this->redactOrderLogPii(null, $customerId);
+        }
+
+        if ($email !== '') {
+            $this->redactEventLogPii($email);
+        }
+
+        return json_encode(true);
+    }
+
+    /**
+     * GDPR access/portability request, dispatched by the official psgdpr module.
+     *
+     * @param array $customer ['id' => int, 'email' => string]
+     *
+     * @return string json_encode of the rows held for this customer
+     */
+    public function hookActionExportGDPRData($customer)
+    {
+        $customerId = (int) ($customer['id'] ?? 0);
+        if ($customerId <= 0) {
+            return json_encode([]);
+        }
+
+        $rows = Db::getInstance()->executeS(
+            'SELECT l.id_order, l.order_reference, l.is_refund, l.total, l.datalayer, l.date_add
+             FROM `' . _DB_PREFIX_ . 'tagpilot_order_log` l
+             INNER JOIN `' . _DB_PREFIX_ . 'orders` o ON o.id_order = l.id_order
+             WHERE o.id_customer = ' . $customerId . '
+             ORDER BY l.date_add DESC'
+        ) ?: [];
+
+        return json_encode($rows, JSON_UNESCAPED_UNICODE);
     }
 
     // ──────────────────────────────────────────────────────────────

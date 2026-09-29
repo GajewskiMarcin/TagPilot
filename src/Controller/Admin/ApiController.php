@@ -16,15 +16,57 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class ApiController extends BaseController
 {
     private const PREFIX = 'TAGPILOT_';
+
+    /**
+     * Credentials that are never rendered back into the admin page.
+     *
+     * The configuration form therefore always posts them empty, so an empty submitted value
+     * means "keep what is stored" rather than "clear it". Without this, every save from the
+     * configuration screen would wipe the secret.
+     */
+    private const WRITE_ONLY_KEYS = [
+        'GA4_API_SECRET',
+        'GOOGLE_CLIENT_SECRET',
+    ];
+
+    /**
+     * Abort with a 403 JSON body unless the current employee holds $permission.
+     *
+     * The page controllers throw AccessDeniedException and let PrestaShop render its permission
+     * screen; these endpoints are consumed by fetch() in views/js/tagpilot.js, which expects
+     * JSON, so they return it instead of throwing.
+     *
+     * @return JsonResponse|null null when access is granted, so callers read as
+     *                           `if ($denied = $this->denyApiUnlessGranted('update')) { ... }`
+     */
+    private function denyApiUnlessGranted(string $permission): ?JsonResponse
+    {
+        if ($this->hasTagPilotPermission($permission)) {
+            return null;
+        }
+
+        return new JsonResponse([
+            'success' => false,
+            'error' => 'You do not have permission to perform this action.',
+        ], 403);
+    }
 
     /**
      * Save configuration
      */
     public function saveConfig(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true);
         if (empty($data)) {
             return new JsonResponse(['success' => false, 'error' => 'Invalid data'], 400);
@@ -50,9 +92,16 @@ class ApiController extends BaseController
         ];
 
         foreach ($data as $key => $value) {
-            if (in_array($key, $allowedKeys, true)) {
-                Configuration::updateValue(self::PREFIX . $key, $value);
+            if (!in_array($key, $allowedKeys, true)) {
+                continue;
             }
+
+            // Write-only credentials are posted empty by design; don't clobber the stored value.
+            if (in_array($key, self::WRITE_ONLY_KEYS, true) && trim((string) $value) === '') {
+                continue;
+            }
+
+            Configuration::updateValue(self::PREFIX . $key, $value);
         }
 
         return new JsonResponse(['success' => true]);
@@ -63,6 +112,10 @@ class ApiController extends BaseController
      */
     public function testConnection(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $measurementId = Configuration::get(self::PREFIX . 'GA4_MEASUREMENT_ID');
         $apiSecret = Configuration::get(self::PREFIX . 'GA4_API_SECRET');
 
@@ -127,6 +180,10 @@ class ApiController extends BaseController
      */
     public function resendOrder(int $id, Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $db = Db::getInstance();
         $log = $db->getRow(
             'SELECT * FROM `' . _DB_PREFIX_ . 'tagpilot_order_log` WHERE id_order_log = ' . (int) $id
@@ -204,6 +261,10 @@ class ApiController extends BaseController
      */
     public function purgeLogs(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('delete')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true) ?: [];
         $purgeAll = !empty($data['all']);
 
@@ -231,10 +292,19 @@ class ApiController extends BaseController
         );
         $deleted = $before - $remaining;
 
+        // The order log is never truncated -- refundAlreadyLogged() and purchaseWasSent() read
+        // those rows to avoid re-sending events -- so its personal data is redacted in place
+        // instead. 'Purge all' redacts regardless of age; otherwise the retention window applies.
+        $module = Module::getInstanceByName('tagpilot');
+        $redacted = $purgeAll
+            ? $module->redactOrderLogPii()
+            : $module->redactOrderLogPii($days);
+
         return new JsonResponse([
             'success' => true,
             'deleted' => $deleted,
             'remaining' => $remaining,
+            'redacted' => $redacted,
             'days' => $days,
         ]);
     }
@@ -245,6 +315,10 @@ class ApiController extends BaseController
 
     public function saveOAuthCredentials(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true);
         $clientId = trim($data['client_id'] ?? '');
         $clientSecret = trim($data['client_secret'] ?? '');
@@ -261,6 +335,10 @@ class ApiController extends BaseController
 
     public function oauthStart(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
 
         if (!$oauth->isConfigured()) {
@@ -285,24 +363,31 @@ class ApiController extends BaseController
 
     public function oauthCallback(Request $request): Response
     {
-        $code = $request->query->get('code', '');
-        $state = $request->query->get('state', '');
-        $error = $request->query->get('error', '');
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
+        $code = (string) $request->query->get('code', '');
+        $state = (string) $request->query->get('state', '');
+        $error = (string) $request->query->get('error', '');
 
         $router = $this->psRouter;
         $wizardUrl = $router->generate('tagpilot_wizard');
 
-        if ($error) {
+        // Consume the stored state up front so it is single-use whatever happens next --
+        // previously the error branch below returned while leaving it valid for a replay.
+        $savedState = (string) Configuration::get(self::PREFIX . 'OAUTH_STATE');
+        Configuration::deleteByName(self::PREFIX . 'OAUTH_STATE');
+
+        if ($error !== '') {
             return new RedirectResponse($wizardUrl . '?oauth_error=' . urlencode($error));
         }
 
-        // Verify state
-        $savedState = (string) Configuration::get(self::PREFIX . 'OAUTH_STATE');
-        if (empty($state) || $state !== $savedState) {
+        // Verify state. The empty checks are not redundant: hash_equals('', '') is true, so
+        // without them a callback with no state would pass when none was stored.
+        if ($state === '' || $savedState === '' || !hash_equals($savedState, $state)) {
             return new RedirectResponse($wizardUrl . '?oauth_error=invalid_state');
         }
-
-        Configuration::deleteByName(self::PREFIX . 'OAUTH_STATE');
 
         $oauth = new GoogleOAuthService();
         $redirectUri = $request->getSchemeAndHttpHost() . $router->generate('tagpilot_oauth_callback');
@@ -318,6 +403,10 @@ class ApiController extends BaseController
 
     public function gtmAccounts(): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('read')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
         $gtm = new GtmApiService($oauth);
 
@@ -332,6 +421,10 @@ class ApiController extends BaseController
 
     public function gtmContainers(string $accountId): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('read')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
         $gtm = new GtmApiService($oauth);
 
@@ -346,6 +439,10 @@ class ApiController extends BaseController
 
     public function gtmConfigure(Request $request): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $data = json_decode($request->getContent(), true);
         $accountId = $data['account_id'] ?? '';
         $containerId = $data['container_id'] ?? '';
@@ -396,6 +493,10 @@ class ApiController extends BaseController
 
     public function gtmPublish(): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
         $gtm = new GtmApiService($oauth);
 
@@ -406,14 +507,29 @@ class ApiController extends BaseController
 
     public function gtmDisconnect(): JsonResponse
     {
-        $oauth = new GoogleOAuthService();
-        $oauth->disconnect();
+        if ($denied = $this->denyApiUnlessGranted('update')) {
+            return $denied;
+        }
 
-        return new JsonResponse(['success' => true]);
+        $oauth = new GoogleOAuthService();
+        $result = $oauth->disconnect();
+
+        // `revoked` false with hadToken true means the local credentials are gone but the grant
+        // may still be live on the Google account; the UI tells the user to finish by hand.
+        return new JsonResponse([
+            'success' => true,
+            'revoked' => $result['revoked'],
+            'hadToken' => $result['hadToken'],
+            'cleared' => count($result['cleared']),
+        ]);
     }
 
     public function gtmStatus(): JsonResponse
     {
+        if ($denied = $this->denyApiUnlessGranted('read')) {
+            return $denied;
+        }
+
         $oauth = new GoogleOAuthService();
 
         return new JsonResponse([
