@@ -25,7 +25,7 @@ class tagpilot extends Module
     {
         $this->name = 'tagpilot';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->author = 'Flavor';
         $this->need_instance = 0;
         $this->bootstrap = false;
@@ -156,10 +156,22 @@ class tagpilot extends Module
         }
 
         // ── Step 2: Add TagPilot tabs ──
+        // DO NOT set `route_name` on the tab. On PS 8.2, if the Symfony route
+        // cache hasn't been regenerated after install (very common for the
+        // first admin request post-install), AdminController::getTabs() throws
+        // RouteNotFoundException and calls $this->get('logger'). When invoked
+        // via Reflection by ps_edition_basic (which bypasses DI), $container
+        // is null and the admin crashes with
+        //   Call to a member function get() on null
+        // — locking the user out of the Back Office.
+        //
+        // Legacy routing via class_name (AdminTagPilot → the stub controller
+        // in controllers/admin/) is immune to this: PS resolves it directly
+        // without hitting the Symfony router, so there's no exception to
+        // trigger the container-null path.
         $tabs = [
             [
                 'class_name' => 'AdminTagPilot',
-                'route_name' => 'tagpilot_dashboard',
                 'name' => 'TagPilot',
                 'id_parent' => $secretSauceId,
             ],
@@ -171,6 +183,8 @@ class tagpilot extends Module
                 $tab = new Tab($existingId);
                 $tab->id_parent = (int) $t['id_parent'];
                 $tab->active = 1;
+                // Clear any legacy `route_name` set by prior versions of this module.
+                $tab->route_name = '';
                 $tab->save();
                 continue;
             }
@@ -178,7 +192,6 @@ class tagpilot extends Module
             $tab = new Tab();
             $tab->active = 1;
             $tab->class_name = $t['class_name'];
-            $tab->route_name = $t['route_name'];
             $tab->module = $this->name;
             $tab->id_parent = (int) $t['id_parent'];
 
