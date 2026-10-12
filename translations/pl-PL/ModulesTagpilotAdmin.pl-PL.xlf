@@ -254,6 +254,18 @@
         <source>Created Variables (%count%)</source>
         <target>Utworzone zmienne (%count%)</target>
       </trans-unit>
+      <trans-unit id="e1d34253d5e9a16b6e0c148a30b6b94b">
+        <source>Clear saved OAuth credentials (Client ID + Secret) and all GTM/Google state? You will need to enter new credentials and re-authorize.</source>
+        <target>Wyczyscic zapisane dane OAuth (Client ID + Secret) i caly stan GTM/Google? Trzeba bedzie wpisac nowe dane i ponownie autoryzowac.</target>
+      </trans-unit>
+      <trans-unit id="c64d97235dd0f92e9fb153dc4fb5a060">
+        <source>Clear saved credentials</source>
+        <target>Wyczysc zapisane dane</target>
+      </trans-unit>
+      <trans-unit id="a6efd3f11bbf12df5697b0a5f92152b8">
+        <source>Credentials cleared</source>
+        <target>Dane uwierzytelniajace wyczyszczone</target>
+      </trans-unit>
       <trans-unit id="27c8372a659be5485d39cff18e63d3ba">
         <source>Credentials saved! Reloading...</source>
         <target>Dane uwierzytelniajace zapisane! Przeladowywanie...</target>
@@ -701,6 +713,10 @@
       <trans-unit id="caab9191ca2d6ec31c61d29cd4e7576a">
         <source>Never send</source>
         <target>Nigdy nie wysylaj</target>
+      </trans-unit>
+      <trans-unit id="510dd801d70dbdadd8e9e81a6d07a676">
+        <source>Need to use a different Google Cloud OAuth app?</source>
+        <target>Chcesz uzyc innej aplikacji OAuth z Google Cloud?</target>
       </trans-unit>
       <trans-unit id="3d0251ee5f71755fa4f92de20ac65216">
         <source>New account created</source>

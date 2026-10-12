@@ -118,6 +118,8 @@ class BaseController extends FrameworkBundleAdminController
             'logsPurgedDetails' => $this->trans('Deleted %deleted% logs, %remaining% remaining.', 'Modules.Tagpilot.Admin'),
             'saveCredentials' => $this->trans('Save credentials', 'Modules.Tagpilot.Admin'),
             'confirmDisconnect' => $this->trans('Disconnect Google account? You can reconnect later.', 'Modules.Tagpilot.Admin'),
+            'confirmClearCredentials' => $this->trans('Clear saved OAuth credentials (Client ID + Secret) and all GTM/Google state? You will need to enter new credentials and re-authorize.', 'Modules.Tagpilot.Admin'),
+            'credentialsCleared' => $this->trans('Credentials cleared', 'Modules.Tagpilot.Admin'),
             'loading' => $this->trans('Loading...', 'Modules.Tagpilot.Admin'),
             'selectContainer' => $this->trans('-- Select container --', 'Modules.Tagpilot.Admin'),
             'errorLoading' => $this->trans('Error loading', 'Modules.Tagpilot.Admin'),
