@@ -412,6 +412,14 @@ class ApiController extends BaseController
         return new JsonResponse(['success' => true]);
     }
 
+    public function gtmClearCredentials(): JsonResponse
+    {
+        $oauth = new GoogleOAuthService();
+        $oauth->clearCredentials();
+
+        return new JsonResponse(['success' => true]);
+    }
+
     public function gtmStatus(): JsonResponse
     {
         $oauth = new GoogleOAuthService();

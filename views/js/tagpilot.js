@@ -341,6 +341,22 @@
                 });
             }
 
+            // Clear OAuth credentials entirely — for switching to a different Google Cloud OAuth app
+            var clearCredsLink = document.getElementById('tp-clear-oauth-creds');
+            if (clearCredsLink) {
+                clearCredsLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!confirm(self.tr('confirmClearCredentials', 'Clear saved OAuth credentials (Client ID + Secret) and all GTM/Google state? You will need to enter new credentials and re-authorize.'))) return;
+                    self.ajax(self.getApiUrl('gtm/clear-credentials'), 'POST')
+                        .then(function (result) {
+                            if (result.success) {
+                                self.toast(self.tr('credentialsCleared', 'Credentials cleared'), 'success');
+                                setTimeout(function () { window.location.reload(); }, 1000);
+                            }
+                        });
+                });
+            }
+
             // GTM Account selection -> load containers
             var accountSelect = document.getElementById('tp-gtm-account');
             var containerSelect = document.getElementById('tp-gtm-container');

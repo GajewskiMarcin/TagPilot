@@ -25,7 +25,7 @@ class tagpilot extends Module
     {
         $this->name = 'tagpilot';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->author = 'Flavor';
         $this->need_instance = 0;
         $this->bootstrap = false;

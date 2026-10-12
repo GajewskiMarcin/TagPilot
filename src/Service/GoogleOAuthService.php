@@ -126,6 +126,20 @@ class GoogleOAuthService
         Configuration::deleteByName(self::PREFIX . 'GTM_CONFIGURED');
     }
 
+    /**
+     * Clears OAuth credentials (Client ID + Secret) ON TOP OF everything disconnect()
+     * clears. Use when the user wants to switch to a different Google Cloud OAuth app
+     * entirely (e.g. new project, revoked app, moved to a different Google account for
+     * administering the app itself). After this, the wizard shows the credential form
+     * again so the user can enter fresh values.
+     */
+    public function clearCredentials(): void
+    {
+        $this->disconnect();
+        Configuration::deleteByName(self::PREFIX . 'GOOGLE_CLIENT_ID');
+        Configuration::deleteByName(self::PREFIX . 'GOOGLE_CLIENT_SECRET');
+    }
+
     private function storeTokens(array $response): void
     {
         Configuration::updateValue(self::PREFIX . 'GOOGLE_ACCESS_TOKEN', $response['access_token']);

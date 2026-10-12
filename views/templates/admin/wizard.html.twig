@@ -78,6 +78,12 @@
                         {{ 'Connect with Google'|trans({}, 'Modules.Tagpilot.Admin') }}
                     </button>
                 {% endif %}
+
+                {# Allow swapping the whole Google Cloud OAuth app (not just the Google account) #}
+                <div class="tp-mt-md tp-text-xs tp-text-muted">
+                    {{ 'Need to use a different Google Cloud OAuth app?'|trans({}, 'Modules.Tagpilot.Admin') }}
+                    <a href="#" id="tp-clear-oauth-creds" class="tp-text-link">{{ 'Clear saved credentials'|trans({}, 'Modules.Tagpilot.Admin') }}</a>
+                </div>
             {% endif %}
         </div>
     </div>

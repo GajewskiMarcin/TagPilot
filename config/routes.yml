@@ -156,6 +156,14 @@ tagpilot_api_gtm_disconnect:
         _legacy_controller: AdminTagPilot
         _legacy_link: AdminTagPilot
 
+tagpilot_api_gtm_clear_credentials:
+    path: /tagpilot/api/gtm/clear-credentials
+    methods: [POST]
+    defaults:
+        _controller: 'Flavor\TagPilot\Controller\Admin\ApiController::gtmClearCredentials'
+        _legacy_controller: AdminTagPilot
+        _legacy_link: AdminTagPilot
+
 tagpilot_api_gtm_status:
     path: /tagpilot/api/gtm/status
     methods: [GET]
