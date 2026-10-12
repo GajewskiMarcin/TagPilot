@@ -27,7 +27,10 @@
     </div>
 
     {# ── STEP 1: Connect Google ──────────────────────────────── #}
-    <div class="tp-card tp-mb-lg" id="tp-wizard-step1"{% if step > 1 and gtmConfigured %} style="display:none"{% endif %}>
+    {# Always visible — once GTM is configured the user still needs access to
+       the Disconnect button and the OAuth credential fields to switch Google
+       accounts, revoke access, or re-enter credentials after a token revoke. #}
+    <div class="tp-card tp-mb-lg" id="tp-wizard-step1">
         <div class="tp-card-header">
             <h2 class="tp-card-title">{{ 'Step 1: Connect your Google account'|trans({}, 'Modules.Tagpilot.Admin') }}</h2>
         </div>
