@@ -105,9 +105,15 @@ If you don't have a CMP: consent defaults to `granted` in gtag's fallback, which
 
 TagPilot is completely free. If it saved you time or money, consider supporting further development:
 
-**[☕ Buy me a coffee](https://buymeacoffee.com/marcingajewski)**
+**[☕ Support on Ko-fi](https://ko-fi.com/quinceproject)**
 
 Every coffee funds bug fixes, PS9 compatibility work, and new features.
+
+Found a bug or have an idea for development? [Report it on GitHub](https://github.com/GajewskiMarcin/TagPilot/issues).
+
+### From the same author
+
+**[Quince Project](https://quinceproject.github.io/)**: a theme and content engine for PrestaShop, extended with a suite of functional modules. Free and open source under OSL-3.0.
 
 ---
 
